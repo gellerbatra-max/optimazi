@@ -1,0 +1,533 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Optimazi Look &amp; Feel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+  /* enable motion-in states before first paint; hard failsafe reveals everything no matter what */
+  (function(){
+    try{
+      if(!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)){
+        document.documentElement.classList.add("anim");
+        setTimeout(function(){ document.documentElement.classList.add("reveal-all"); }, 7000);
+      }
+    }catch(e){}
+  })();
+</script>
+<style>
+  :root{
+    --ink:#0C1122; --ink-2:#121A30; --ink-3:#1A2440;
+    --chalk:#EFE7D6; --chalk-ink:#1A1712; --chalk-dim:#6B6552;
+    --fg:#E9E7DE; --fg-dim:#93A2BF; --fg-faint:#5E6C86;
+    --line:rgba(233,231,222,.12); --line-2:rgba(233,231,222,.06);
+    --pop:#FF5D2E; --pop-deep:#E8461C; --ice:#8FBEDD; --ice-deep:#4E86AD;
+    --maxw:1160px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+  body{margin:0; background:var(--ink); color:var(--fg);
+    font-family:"Hanken Grotesk",system-ui,sans-serif; line-height:1.6; overflow-x:clip; -webkit-font-smoothing:antialiased}
+  h1,h2,h3,.disp{font-family:"Bricolage Grotesque","Hanken Grotesk",sans-serif; font-weight:700; line-height:1; margin:0; text-wrap:balance; letter-spacing:-.02em}
+  .mono{font-family:"Spline Sans Mono",ui-monospace,monospace}
+  .label{font-family:"Spline Sans Mono",monospace; font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; color:var(--fg-faint)}
+  .tnum{font-variant-numeric:tabular-nums}
+  a{color:inherit; text-decoration:none}
+  ::selection{background:var(--pop); color:#fff}
+
+  /* ambient canvas + grain */
+  #amb{position:fixed; inset:0; z-index:0; display:block; pointer-events:none}
+  .grain{position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.4; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='0.55'/></svg>")}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 clamp(20px,5vw,56px); position:relative; z-index:2}
+
+  /* custom cursor */
+  .cursor,.cursor-dot{position:fixed; top:0; left:0; z-index:95; pointer-events:none; border-radius:50%; mix-blend-mode:difference; will-change:transform}
+  .cursor{width:38px; height:38px; border:1.5px solid #fff; margin:-19px 0 0 -19px; transition:width .25s, height .25s, margin .25s, opacity .3s}
+  .cursor-dot{width:6px; height:6px; background:#fff; margin:-3px 0 0 -3px}
+  .cursor.grow{width:66px; height:66px; margin:-33px 0 0 -33px}
+  body.has-cursor{cursor:none}
+  body.has-cursor a,body.has-cursor button{cursor:none}
+  @media (hover:none),(pointer:coarse){ .cursor,.cursor-dot{display:none!important} }
+
+  /* top bar */
+  .bar{position:fixed; top:0; left:0; right:0; z-index:60; display:flex; align-items:center; justify-content:space-between;
+    padding:18px clamp(20px,5vw,56px)}
+  .brand{display:flex; align-items:center; gap:12px; font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:1.4rem; letter-spacing:-.02em}
+  .brand .mk{width:28px; height:28px; border:1.5px solid var(--pop); border-radius:8px; display:grid; place-items:center; font-size:.92rem; color:var(--pop)}
+  .brand i{font-style:normal; color:var(--pop)}
+  .bar__right{display:flex; align-items:center; gap:12px}
+  .pill{font-family:"Spline Sans Mono",monospace; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600;
+    padding:12px 18px; border-radius:999px; background:var(--pop); color:#fff; border:1px solid var(--pop); position:relative; will-change:transform}
+  .pill:hover{background:var(--pop-deep); border-color:var(--pop-deep)}
+  .menu-btn{width:48px; height:48px; border-radius:12px; border:1px solid var(--line); background:rgba(233,231,222,.04); display:grid; place-items:center; cursor:pointer; color:var(--fg)}
+  .menu-btn span{display:block; width:20px; height:1.5px; background:currentColor; position:relative; transition:transform .3s}
+  .menu-btn span::before{content:""; position:absolute; left:0; top:-6px; width:20px; height:1.5px; background:currentColor; transition:transform .3s, top .3s}
+  .menu-btn.x span{transform:rotate(45deg)} .menu-btn.x span::before{top:0; transform:rotate(-90deg)}
+
+  /* full-screen menu */
+  .overlay{position:fixed; inset:0; z-index:50; background:color-mix(in oklab,var(--ink) 92%, transparent);
+    -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+    opacity:0; visibility:hidden; transition:opacity .55s ease, visibility .55s}
+  .overlay.open{opacity:1; visibility:visible}
+  .navlink{position:relative; display:inline-block; font-family:"Bricolage Grotesque",sans-serif; font-weight:700;
+    font-size:clamp(2.6rem,10vw,6rem); line-height:1.08; letter-spacing:-.03em; color:var(--fg);
+    padding:2px 10px; opacity:.5; transform:translateY(20px); transition:opacity .55s, transform .55s, color .3s}
+  .overlay.open .navlink{opacity:.55; transform:none; transition-delay:calc(var(--i)*.07s + .12s)}
+  .navlink:hover,.navlink.active{opacity:1; color:var(--pop)}
+  .navlink .stitch{position:absolute; left:10px; right:10px; bottom:10px; height:8px; pointer-events:none}
+  .navlink .stitch line{stroke:var(--pop); stroke-width:2.5; stroke-dasharray:7 6; stroke-linecap:round; stroke-dashoffset:240; opacity:0; transition:stroke-dashoffset .6s ease, opacity .3s}
+  .navlink:hover .stitch line,.navlink.active .stitch line{stroke-dashoffset:0; opacity:1}
+  .overlay__meta{margin-top:min(7vh,60px); display:flex; flex-direction:column; align-items:center; gap:16px}
+  .overlay__enq{font-family:"Spline Sans Mono",monospace; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--fg-faint)}
+  .overlay__enq b{color:var(--ice); font-weight:500}
+  .overlay__socials{display:flex; gap:22px}
+  .overlay__socials a{font-family:"Spline Sans Mono",monospace; font-size:.74rem; letter-spacing:.12em; text-transform:uppercase; color:var(--fg-dim)}
+  .overlay__socials a:hover{color:var(--pop)}
+
+  /* motion primitives */
+  .anim .rl{opacity:0; transform:translateY(28px)}
+  .anim .play .rl,.anim .rl.in{opacity:1; transform:none; transition:opacity .7s ease, transform .9s cubic-bezier(.16,1,.3,1); transition-delay:calc(var(--i,0)*.08s)}
+  .line{display:block; overflow:hidden; padding-bottom:.08em}
+  .anim .line-in{display:block; transform:translateY(112%)}
+  .anim .play .line-in{transform:translateY(0); transition:transform 1s cubic-bezier(.16,1,.3,1); transition-delay:calc(var(--i,0)*.09s)}
+  .reveal-all .rl,.reveal-all .line-in{opacity:1!important; transform:none!important}
+
+  /* hero */
+  .hero{min-height:94vh; display:flex; flex-direction:column; justify-content:center; padding:110px 0 60px}
+  .hero .kick{display:flex; align-items:center; gap:12px; margin-bottom:26px; flex-wrap:wrap}
+  .hero .kick .d{width:8px; height:8px; border-radius:50%; background:var(--pop); box-shadow:0 0 0 4px color-mix(in oklab,var(--pop) 22%, transparent)}
+  .hero__title{font-size:clamp(3rem,9vw,7rem); letter-spacing:-.035em}
+  .hero__title em{font-style:italic; color:var(--pop); font-family:"Bricolage Grotesque",serif}
+  .hero .sub{margin-top:28px; max-width:42ch; font-size:clamp(1.05rem,2vw,1.3rem); color:var(--fg-dim)}
+  .hero .actions{margin-top:36px; display:flex; align-items:center; gap:22px; flex-wrap:wrap}
+  .hero .ghost{font-family:"Spline Sans Mono",monospace; font-size:.76rem; letter-spacing:.08em; text-transform:uppercase; color:var(--fg); border-bottom:1px solid var(--ice); padding-bottom:4px}
+  .hero .ghost:hover{color:var(--ice)}
+  .scrollcue{margin-top:56px; display:flex; align-items:center; gap:12px; color:var(--fg-faint)}
+  .scrollcue .ln{width:36px; height:1px; background:var(--pop); transform-origin:left; animation:cue 2.4s ease-in-out infinite}
+  @keyframes cue{0%,100%{transform:scaleX(.4)}50%{transform:scaleX(1)}}
+  @media (prefers-reduced-motion:reduce){.scrollcue .ln{animation:none}}
+
+  .ticket{position:absolute; right:clamp(20px,5vw,56px); bottom:9vh; width:min(300px,72vw); background:var(--ink-2);
+    border:1px solid var(--line); border-radius:16px; overflow:hidden; box-shadow:0 30px 60px -30px #000; display:none}
+  @media(min-width:940px){.ticket{display:block}}
+  .ticket__hd{display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px dashed var(--line)}
+  .ticket__hd .t{font-family:"Spline Sans Mono",monospace; font-size:.64rem; letter-spacing:.14em; text-transform:uppercase; color:var(--fg-faint)}
+  .ticket__hd .live{font-family:"Spline Sans Mono",monospace; font-size:.62rem; color:var(--ice); display:flex; align-items:center; gap:6px}
+  .ticket__hd .live::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--ice); box-shadow:0 0 8px var(--ice); animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .ticket__body{padding:16px}
+  .ticket__eff{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:3.1rem; color:var(--pop); line-height:1; letter-spacing:-.03em}
+  .ticket__eff small{font-size:1.1rem; color:var(--fg-dim)}
+  .ticket__rows{margin-top:14px; display:grid; gap:9px}
+  .ticket__rows .r{display:flex; justify-content:space-between; font-size:.82rem; padding-bottom:9px; border-bottom:1px dotted var(--line)}
+  .ticket__rows .r:last-child{border-bottom:0; padding-bottom:0}
+  .ticket__rows .k{font-family:"Spline Sans Mono",monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-faint)}
+  .ticket__perf{height:14px; background:radial-gradient(circle at 7px 0, transparent 0 6px, var(--ink-2) 6px) repeat-x; background-size:14px 14px}
+
+  /* marquee */
+  .marq{border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:20px 0; overflow:hidden; white-space:nowrap; position:relative; z-index:2}
+  .marq + .marq{border-top:0}
+  .marq__track{display:inline-flex; gap:40px; will-change:transform}
+  .marq span{font-family:"Bricolage Grotesque",sans-serif; font-weight:600; font-size:clamp(1.3rem,3vw,2.1rem); color:var(--fg-dim); display:inline-flex; align-items:center; gap:40px}
+  .marq span b{color:var(--pop)} .marq span i{color:var(--ice); font-style:normal}
+  .marq .dot{width:7px; height:7px; border-radius:50%; background:var(--fg-faint); display:inline-block}
+
+  section.s{padding:clamp(72px,11vw,150px) 0; position:relative}
+  .eyebrow{display:flex; align-items:baseline; gap:14px; margin-bottom:22px}
+  .eyebrow .n{font-family:"Spline Sans Mono",monospace; font-size:.78rem; color:var(--pop)}
+  .h2{font-size:clamp(2rem,4.6vw,3.5rem); max-width:20ch}
+  .h2 em{font-style:italic; color:var(--pop); font-family:"Bricolage Grotesque",serif}
+  .lead{margin-top:20px; max-width:56ch; color:var(--fg-dim); font-size:1.06rem}
+
+  /* nesting motif */
+  .nest{margin-top:42px; aspect-ratio:16/6; border:1px solid var(--line); border-radius:16px; background:#080B16; padding:14px;
+    display:grid; grid-template-columns:repeat(20,1fr); grid-template-rows:repeat(6,1fr); gap:5px; position:relative}
+  @media(max-width:720px){.nest{aspect-ratio:16/9; grid-template-columns:repeat(12,1fr)}}
+  .pc{border-radius:3px; background:color-mix(in oklab,var(--ice) 22%, var(--ink-2)); border:1px solid color-mix(in oklab,var(--ice) 34%,transparent)}
+  .pc.p{background:color-mix(in oklab,var(--pop) 22%, var(--ink-2)); border-color:color-mix(in oklab,var(--pop) 40%,transparent)}
+  .anim .nest .pc{opacity:0; transform:scale(.4)}
+  .anim .nest.in .pc{opacity:1; transform:none; transition:opacity .5s ease, transform .7s cubic-bezier(.2,1.2,.3,1); transition-delay:calc(var(--d,0)*.045s)}
+  .reveal-all .nest .pc{opacity:1!important; transform:none!important}
+  .nest__badge{position:absolute; right:14px; bottom:14px; font-family:"Spline Sans Mono",monospace; font-size:.72rem;
+    background:var(--ink); border:1px solid var(--line); padding:6px 11px; border-radius:8px; color:var(--fg)}
+  .nest__badge b{color:var(--pop)}
+
+  /* curved divider + chalk panel */
+  .curve{line-height:0; position:relative; z-index:2}
+  .curve svg{display:block; width:100%; height:clamp(56px,8vw,110px)}
+  .chalk{background:var(--chalk); color:var(--chalk-ink); position:relative; z-index:2; padding:6px 0 clamp(60px,9vw,110px); margin-top:-1px}
+  .chalk .eyebrow .n{color:var(--pop-deep)}
+  .chalk .eyebrow .label{color:var(--chalk-dim)}
+  .mixhead{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(2.6rem,8vw,6rem); line-height:.92; letter-spacing:-.04em; margin-top:6px}
+  .mixhead .a{display:block; color:var(--chalk-ink)}
+  .mixhead .b{display:block; font-style:italic; color:var(--pop-deep); font-weight:600}
+  .chalk .lead{color:#4C4636; max-width:52ch}
+  .stack{position:relative; margin-top:46px; display:grid; grid-template-columns:1.4fr .78fr; align-items:center}
+  @media(max-width:820px){.stack{grid-template-columns:1fr}}
+  .stack__main{background:#080B16; border-radius:18px; overflow:hidden; box-shadow:0 40px 80px -42px rgba(0,0,0,.5); position:relative; z-index:1}
+  .stack__main .top{display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px dashed var(--line)}
+  .stack__main .top .t{font-family:"Spline Sans Mono",monospace; font-size:.62rem; letter-spacing:.13em; text-transform:uppercase; color:var(--fg-faint)}
+  .stack__main .top .g{font-family:"Spline Sans Mono",monospace; font-size:.62rem; color:var(--ice); display:flex; align-items:center; gap:6px}
+  .stack__main .top .g::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--ice); box-shadow:0 0 8px var(--ice)}
+  .stack__nest{padding:14px; display:grid; grid-template-columns:repeat(16,1fr); grid-template-rows:repeat(5,1fr); gap:4px; height:clamp(200px,26vw,250px)}
+  .stack__accent{position:relative; z-index:2; margin-left:-16%; background:var(--pop); color:#fff; border-radius:16px; padding:24px;
+    box-shadow:0 30px 60px -28px rgba(255,93,46,.5); width:min(320px,90%); justify-self:start}
+  @media(max-width:820px){.stack__accent{margin:-44px 6% 0 auto}}
+  .stack__accent .k{font-family:"Spline Sans Mono",monospace; font-size:.62rem; letter-spacing:.14em; text-transform:uppercase; opacity:.85}
+  .stack__accent .big{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:3.1rem; line-height:1; margin-top:8px; letter-spacing:-.03em}
+  .stack__accent .d{font-size:.85rem; margin-top:8px; max-width:26ch; opacity:.95}
+  .bonepill{display:inline-block; margin-top:42px; font-family:"Spline Sans Mono",monospace; font-size:.74rem; letter-spacing:.08em; text-transform:uppercase; color:var(--chalk-ink); border-bottom:1px solid var(--pop-deep); padding-bottom:4px}
+
+  /* horizontal scroll-track */
+  .track{position:relative; height:340vh; background:var(--ink)}
+  .track__sticky{position:sticky; top:0; height:100vh; display:flex; flex-direction:column; justify-content:center; overflow:hidden}
+  .track__head{padding:0 6vw 30px}
+  .track__row{display:flex; gap:20px; padding:0 6vw; will-change:transform}
+  .track__card{flex:0 0 min(390px,80vw); background:var(--ink-2); border:1px solid var(--line); border-radius:16px; padding:26px;
+    min-height:clamp(300px,42vh,360px); display:flex; flex-direction:column; justify-content:space-between; transition:border-color .3s, transform .3s}
+  .track__card:hover{border-color:var(--pop); transform:translateY(-4px)}
+  .track__card .lab{font-family:"Spline Sans Mono",monospace; font-size:.62rem; letter-spacing:.12em; text-transform:uppercase; color:var(--fg-faint)}
+  .track__card .co{font-family:"Bricolage Grotesque",sans-serif; font-weight:600; font-size:1.6rem; margin-top:9px; letter-spacing:-.02em}
+  .track__card .jump{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(2.8rem,5vw,3.6rem); line-height:1; color:var(--pop); letter-spacing:-.03em}
+  .track__card .jump small{font-size:.36em; color:var(--fg-dim)}
+  .track__card .jump s{font-family:"Spline Sans Mono",monospace; font-size:.8rem; color:var(--fg-faint); text-decoration:none; display:block; margin-top:8px; letter-spacing:.03em}
+  .track__card .foot{font-size:.85rem; color:var(--fg-dim); margin-top:14px}
+  .track__prog{height:2px; background:var(--line); margin:26px 6vw 0; position:relative}
+  .track__prog i{position:absolute; left:0; top:0; height:100%; width:0; background:var(--pop)}
+  @media(prefers-reduced-motion:reduce){
+    .track{height:auto} .track__sticky{position:static; height:auto; overflow-x:auto; padding:60px 0} .track__row{transform:none!important}
+  }
+
+  /* parallax band */
+  .para{position:relative; overflow:hidden; padding:clamp(100px,17vw,210px) 0; text-align:center; background:var(--ink)}
+  .para__ghost{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); font-family:"Bricolage Grotesque",sans-serif; font-weight:800;
+    font-size:clamp(9rem,34vw,26rem); color:rgba(255,93,46,.07); white-space:nowrap; pointer-events:none; z-index:0; will-change:transform}
+  .para .wrap{position:relative; z-index:2}
+  .para h2{font-size:clamp(1.9rem,5vw,3.4rem); max-width:19ch; margin:0 auto} .para h2 em{font-style:italic; color:var(--ice); font-family:"Bricolage Grotesque",serif}
+
+  /* metrics + before/after */
+  .metrics{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:16px; overflow:hidden; margin-top:40px}
+  @media(max-width:720px){.metrics{grid-template-columns:repeat(2,1fr)}}
+  .metric{background:var(--ink-2); padding:26px 22px; transition:background .3s}
+  .metric:hover{background:var(--ink-3)}
+  .metric .n{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(1.9rem,3.4vw,2.7rem); letter-spacing:-.03em}
+  .metric .n small{color:var(--pop); font-size:.7em}
+  .metric .l{margin-top:8px; font-size:.82rem; color:var(--fg-faint)}
+  .ba{display:grid; grid-template-columns:1fr auto 1fr; margin-top:40px; border:1px solid var(--line); border-radius:18px; overflow:hidden}
+  @media(max-width:640px){.ba{grid-template-columns:1fr}}
+  .ba__col{padding:32px clamp(20px,3vw,38px); background:var(--ink-2)}
+  .ba__col.after{background:linear-gradient(180deg,color-mix(in oklab,var(--pop) 10%,var(--ink-2)),var(--ink-2))}
+  .ba__lab{font-family:"Spline Sans Mono",monospace; font-size:.62rem; letter-spacing:.14em; text-transform:uppercase; color:var(--fg-faint)}
+  .ba__eff{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(2.4rem,5vw,3.6rem); margin-top:12px; line-height:1; letter-spacing:-.03em}
+  .ba__col.before .ba__eff{color:var(--fg-dim)} .ba__col.after .ba__eff{color:var(--pop)}
+  .ba__txt{margin-top:14px; font-size:.9rem; color:var(--fg-dim); max-width:34ch}
+  .ba__seam{width:1px; background:repeating-linear-gradient(180deg,var(--pop) 0 7px, transparent 7px 14px)}
+  @media(max-width:640px){.ba__seam{width:auto; height:1px; background:repeating-linear-gradient(90deg,var(--pop) 0 7px,transparent 7px 14px)}}
+
+  .cta{text-align:center; padding:clamp(90px,15vw,190px) 0}
+  .cta h2{font-size:clamp(2.4rem,6.5vw,5rem)} .cta h2 em{font-style:italic; color:var(--pop); font-family:"Bricolage Grotesque",serif}
+  .cta .pill{display:inline-block; margin-top:36px; font-size:.82rem; padding:16px 28px}
+  .foot{border-top:1px solid var(--line); padding:34px 0; display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; position:relative; z-index:2}
+  .foot span{font-family:"Spline Sans Mono",monospace; font-size:.72rem; letter-spacing:.08em; color:var(--fg-faint)}
+  :focus-visible{outline:2px solid var(--ice); outline-offset:3px; border-radius:3px}
+</style>
+
+<canvas id="amb" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"></div>
+<div class="cursor-dot" aria-hidden="true"></div>
+
+<header class="bar">
+  <a class="brand" href="#top" aria-label="Optimazi home"><span class="mk">O</span><span>Optim<i>a</i>zi</span></a>
+  <div class="bar__right">
+    <a class="pill magnetic" href="#demo">Book a demo</a>
+    <button class="menu-btn magnetic" id="menuBtn" aria-label="Open menu" aria-expanded="false"><span></span></button>
+  </div>
+</header>
+
+<nav class="overlay" id="overlay" aria-label="Main menu" aria-hidden="true">
+  <div>
+    <a class="navlink active" style="--i:0" href="#top">Home<svg class="stitch" viewBox="0 0 240 8" preserveAspectRatio="none"><line x1="2" y1="4" x2="238" y2="4"/></svg></a><br>
+    <a class="navlink" style="--i:1" href="#solutions">Solutions<svg class="stitch" viewBox="0 0 240 8" preserveAspectRatio="none"><line x1="2" y1="4" x2="238" y2="4"/></svg></a><br>
+    <a class="navlink" style="--i:2" href="#proof">Proof<svg class="stitch" viewBox="0 0 240 8" preserveAspectRatio="none"><line x1="2" y1="4" x2="238" y2="4"/></svg></a><br>
+    <a class="navlink" style="--i:3" href="#demo">Book a demo<svg class="stitch" viewBox="0 0 240 8" preserveAspectRatio="none"><line x1="2" y1="4" x2="238" y2="4"/></svg></a>
+  </div>
+  <div class="overlay__meta">
+    <div class="overlay__enq">Business enquiries — <b>info@gelianfashion.com</b></div>
+    <div class="overlay__socials"><a href="#">LinkedIn</a><a href="#">Instagram</a><a href="#">YouTube</a><a href="#">Contact</a></div>
+  </div>
+</nav>
+
+<main id="top">
+  <section class="hero wrap" id="hero">
+    <div>
+      <div class="kick rl" style="--i:0"><span class="d"></span><span class="label">Optimazi · by Gelian</span><span class="label">AI fabric-cost optimizer</span></div>
+      <h1 class="hero__title">
+        <span class="line"><span class="line-in" style="--i:1">Every gram of fabric,</span></span>
+        <span class="line"><span class="line-in" style="--i:2"><em>accounted for.</em></span></span>
+      </h1>
+      <p class="sub rl" style="--i:4">Marker to cut plan in minutes — nested to the best efficiency in the industry. Human intuition, AI speed.</p>
+      <div class="actions rl" style="--i:5">
+        <a class="pill magnetic" href="#demo">Book a demo</a>
+        <a class="ghost" href="#solutions">See how it works</a>
+      </div>
+      <div class="scrollcue rl" style="--i:6"><span class="ln"></span><span class="label">Scroll</span></div>
+    </div>
+    <aside class="ticket" aria-label="Live marker efficiency">
+      <div class="ticket__hd"><span class="t">Next cut · Marker 04</span><span class="live">Ultranest live</span></div>
+      <div class="ticket__body">
+        <div class="ticket__eff tnum" data-count="88.4" data-dec="1">0.0<small>%</small></div>
+        <div class="ticket__rows">
+          <div class="r"><span class="k">Style</span><span class="mono">MW-SHIRT / cotton twill</span></div>
+          <div class="r"><span class="k">Marker width</span><span class="mono tnum">150 cm</span></div>
+          <div class="r"><span class="k">Consumption</span><span class="mono tnum">1.42 m / gmt</span></div>
+          <div class="r"><span class="k">Saved vs 78%</span><span class="mono" style="color:var(--ice)">+13.4%</span></div>
+        </div>
+      </div>
+      <div class="ticket__perf" aria-hidden="true"></div>
+    </aside>
+  </section>
+
+  <div class="marq" aria-hidden="true"><div class="marq__track" data-dir="1"><span>Marker making<i class="dot"></i><b>Nesting</b><i class="dot"></i>Cut planning<i class="dot"></i><i>Roll matching</i><i class="dot"></i>PLM &amp; BOM<i class="dot"></i>Marker making<i class="dot"></i><b>Nesting</b><i class="dot"></i>Cut planning<i class="dot"></i><i>Roll matching</i><i class="dot"></i>PLM &amp; BOM<i class="dot"></i></span></div></div>
+  <div class="marq" aria-hidden="true"><div class="marq__track" data-dir="-1"><span>85–90% efficiency<i class="dot"></i><i>browser-native</i><i class="dot"></i>hours → minutes<i class="dot"></i><b>zero re-entry</b><i class="dot"></i>every roll matched<i class="dot"></i>85–90% efficiency<i class="dot"></i><i>browser-native</i><i class="dot"></i>hours → minutes<i class="dot"></i><b>zero re-entry</b><i class="dot"></i>every roll matched<i class="dot"></i></span></div></div>
+
+  <section class="s wrap" id="solutions">
+    <div class="eyebrow rl"><span class="n">01</span><span class="label">The bottleneck</span></div>
+    <h2 class="h2 rl">The step that decides your margin — usually done <em>by hand, under pressure.</em></h2>
+    <p class="lead rl">Marker making and nesting is where fabric is won or lost. Optimazi turns one rushed guess into the best layout, every time — and shows you the number before you commit.</p>
+    <div class="nest" role="img" aria-label="Pattern pieces nested at 88.4% efficiency">
+      <span class="pc p" style="grid-area:1/1/4/4;--d:0"></span><span class="pc" style="grid-area:1/4/3/8;--d:1"></span>
+      <span class="pc" style="grid-area:1/8/4/12;--d:2"></span><span class="pc p" style="grid-area:1/12/3/16;--d:3"></span>
+      <span class="pc" style="grid-area:1/16/4/21;--d:4"></span><span class="pc" style="grid-area:4/1/7/5;--d:5"></span>
+      <span class="pc p" style="grid-area:3/5/6/8;--d:6"></span><span class="pc" style="grid-area:4/8/7/12;--d:7"></span>
+      <span class="pc" style="grid-area:3/12/6/16;--d:8"></span><span class="pc p" style="grid-area:4/16/7/21;--d:9"></span>
+      <span class="pc" style="grid-area:6/5/7/8;--d:10"></span><span class="pc" style="grid-area:6/12/7/16;--d:11"></span>
+      <span class="nest__badge mono">EFFICIENCY <b>88.4%</b></span>
+    </div>
+  </section>
+
+  <div class="curve" aria-hidden="true"><svg viewBox="0 0 1440 110" preserveAspectRatio="none"><path d="M0,0 C380,92 1060,92 1440,0 L1440,110 L0,110 Z" fill="#EFE7D6"/></svg></div>
+  <section class="chalk">
+    <div class="wrap">
+      <div class="eyebrow rl"><span class="n">02</span><span class="label">The engines</span></div>
+      <h2 class="mixhead rl"><span class="a">Marker to</span><span class="b">cut plan, in minutes.</span></h2>
+      <p class="lead rl">Describe it to Marka, nest it with Ultranest, and see the efficiency before you commit — the panels below are live mock-ups of the real thing.</p>
+      <div class="stack rl">
+        <div class="stack__main">
+          <div class="top"><span class="t">Ultranest · marker 04</span><span class="g">nesting</span></div>
+          <div class="stack__nest" role="img" aria-label="Nested pattern pieces">
+            <span class="pc p" style="grid-area:1/1/3/4"></span><span class="pc" style="grid-area:1/4/2/8"></span>
+            <span class="pc" style="grid-area:1/8/3/12"></span><span class="pc" style="grid-area:1/12/3/17"></span>
+            <span class="pc" style="grid-area:3/1/6/5"></span><span class="pc" style="grid-area:2/5/4/8"></span>
+            <span class="pc p" style="grid-area:3/8/6/12"></span><span class="pc" style="grid-area:3/12/5/15"></span>
+            <span class="pc" style="grid-area:4/5/6/8"></span><span class="pc" style="grid-area:5/12/6/17"></span>
+            <span class="pc p" style="grid-area:3/15/6/17"></span>
+          </div>
+        </div>
+        <div class="stack__accent">
+          <div class="k">Efficiency gain</div>
+          <div class="big tnum">+13.4%</div>
+          <div class="d">over the hand-built 78% marker — fabric that's simply never cut.</div>
+        </div>
+      </div>
+      <a class="bonepill" href="#demo">Explore the engines ↗</a>
+    </div>
+  </section>
+  <div class="curve" aria-hidden="true"><svg viewBox="0 0 1440 110" preserveAspectRatio="none"><path d="M0,0 L1440,0 L1440,44 C1060,120 380,120 0,44 Z" fill="#EFE7D6"/></svg></div>
+
+  <section class="track" id="proof">
+    <div class="track__sticky">
+      <div class="track__head">
+        <div class="eyebrow"><span class="n">03</span><span class="label">Proof on the floor — scroll →</span></div>
+        <h2 class="h2">Real lines. Real <em>points</em> recovered.</h2>
+      </div>
+      <div class="track__row">
+        <article class="track__card">
+          <div><div class="lab">Program 01 · cotton poplin</div><div class="co">Oxford shirt run</div></div>
+          <div><div class="jump tnum">89.1<small>%</small><s>from 78.2% by hand</s></div><div class="foot">+10.9 points on a 24k-unit cut — ~1,900 m of fabric recovered.</div></div>
+        </article>
+        <article class="track__card">
+          <div><div class="lab">Program 02 · 12 oz stretch denim</div><div class="co">Five-pocket jean</div></div>
+          <div><div class="jump tnum">86.3<small>%</small><s>from 74.6% by hand</s></div><div class="foot">+11.7 points — denim's the most expensive metre to waste.</div></div>
+        </article>
+        <article class="track__card">
+          <div><div class="lab">Program 03 · single jersey</div><div class="co">Ribbed knit tee</div></div>
+          <div><div class="jump tnum">90.4<small>%</small><s>from 81.0% by hand</s></div><div class="foot">+9.4 points, and roll-matched so every width is used.</div></div>
+        </article>
+        <article class="track__card">
+          <div><div class="lab">Program 04 · bonded softshell</div><div class="co">Tailored outerwear</div></div>
+          <div><div class="jump tnum">84.9<small>%</small><s>from 71.8% by hand</s></div><div class="foot">+13.1 points on the hardest shapes to nest by hand.</div></div>
+        </article>
+      </div>
+      <div class="track__prog" aria-hidden="true"><i></i></div>
+    </div>
+  </section>
+
+  <section class="para">
+    <div class="para__ghost" data-para="0.14" aria-hidden="true">88.4%</div>
+    <div class="wrap"><h2 class="rl">From the first pattern to the final cut — <em>every gram accounted for.</em></h2></div>
+  </section>
+
+  <section class="s wrap" id="math">
+    <div class="eyebrow rl"><span class="n">04</span><span class="label">The math</span></div>
+    <h2 class="h2 rl">A few points of efficiency. A <em>very different</em> bottom line.</h2>
+    <div class="metrics rl">
+      <div class="metric"><div class="n">85–90<small>%</small></div><div class="l">Efficiency Optimazi is built for</div></div>
+      <div class="metric"><div class="n">Minutes</div><div class="l">Marker built, not hours</div></div>
+      <div class="metric"><div class="n">100<small>%</small></div><div class="l">Browser-native · nothing to install</div></div>
+      <div class="metric"><div class="n">$50M<small>+</small></div><div class="l">Illustrative saving · $1B house</div></div>
+    </div>
+    <div class="ba rl">
+      <div class="ba__col before"><div class="ba__lab">The old way</div><div class="ba__eff tnum">78%</div><div class="ba__txt">One marker, built by hand against the clock. The first layout ships — even when it wastes fabric.</div></div>
+      <div class="ba__seam" aria-hidden="true"></div>
+      <div class="ba__col after"><div class="ba__lab">With Optimazi</div><div class="ba__eff tnum" data-count="88.4" data-dec="1" data-suffix="%">0%</div><div class="ba__txt">Ultranest nests it to the best efficiency in the industry, and shows the number before you commit.</div></div>
+    </div>
+  </section>
+
+  <section class="cta wrap" id="demo">
+    <h2 class="rl">Ready to see it on <em>your</em> styles?</h2>
+    <a class="pill magnetic" href="#top">Book a demo</a>
+  </section>
+
+  <footer class="foot wrap">
+    <span>Optimazi — a look &amp; feel preview · Gelian (Pvt) Ltd</span>
+    <span>Marker making · Nesting · Cut planning</span>
+  </footer>
+</main>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var docEl = document.documentElement;
+
+  function closeMenu(){ open=false; overlay.classList.remove("open"); btn.classList.remove("x");
+    btn.setAttribute("aria-expanded","false"); overlay.setAttribute("aria-hidden","true"); btn.setAttribute("aria-label","Open menu"); }
+  function openMenu(){ open=true; overlay.classList.add("open"); btn.classList.add("x");
+    btn.setAttribute("aria-expanded","true"); overlay.setAttribute("aria-hidden","false"); btn.setAttribute("aria-label","Close menu"); }
+  var btn=document.getElementById("menuBtn"), overlay=document.getElementById("overlay"), open=false;
+  btn.addEventListener("click", function(){ open?closeMenu():openMenu(); });
+  document.addEventListener("keydown", function(e){ if(e.key==="Escape"&&open) closeMenu(); });
+  overlay.querySelectorAll(".navlink").forEach(function(l){
+    l.addEventListener("click", function(){ overlay.querySelectorAll(".navlink").forEach(function(n){n.classList.remove("active")}); l.classList.add("active"); setTimeout(closeMenu,140); });
+  });
+
+  /* hero load sequence */
+  var hero=document.getElementById("hero");
+  if(hero){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ hero.classList.add("play"); }); }); }
+
+  /* reveal + nest settle + count triggers (one observer) */
+  function reveal(el){ el.classList.add("in"); }
+  if("IntersectionObserver" in window && !reduce){
+    var io=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ reveal(en.target); if(en.target.hasAttribute("data-count")) count(en.target); io.unobserve(en.target); } }); }, {threshold:.16, rootMargin:"0px 0px -6% 0px"});
+    document.querySelectorAll(".rl,.nest,[data-count]").forEach(function(el){ io.observe(el); });
+    window.addEventListener("load", function(){ setTimeout(function(){ document.querySelectorAll(".rl,.nest").forEach(reveal); }, 3500); });
+  } else {
+    document.querySelectorAll(".rl,.nest").forEach(reveal);
+    document.querySelectorAll("[data-count]").forEach(count);
+  }
+
+  /* count-up */
+  function count(el){
+    if(el.__done) return; el.__done=true;
+    var to=parseFloat(el.getAttribute("data-count")), dec=parseInt(el.getAttribute("data-dec")||"0",10), suf=el.getAttribute("data-suffix")||"", t0=null;
+    var small=el.querySelector("small"); var sfx=small?"":suf;
+    function step(ts){ if(!t0)t0=ts; var p=Math.min(1,(ts-t0)/1300); var v=(to*(1-Math.pow(1-p,3))).toFixed(dec);
+      if(small){ el.firstChild.nodeValue=v; } else { el.textContent=v+sfx; }
+      if(p<1) requestAnimationFrame(step); }
+    if(reduce){ if(small) el.firstChild.nodeValue=to.toFixed(dec); else el.textContent=to.toFixed(dec)+sfx; return; }
+    requestAnimationFrame(step);
+  }
+
+  /* ---- unified rAF ticker: cursor, marquees, parallax, track ---- */
+  var mx=innerWidth/2, my=innerHeight/2, cx=mx, cy=my;
+  var fine = window.matchMedia && window.matchMedia("(hover:hover) and (pointer:fine)").matches;
+  var cur=document.querySelector(".cursor"), dot=document.querySelector(".cursor-dot");
+  if(fine && !reduce){
+    document.body.classList.add("has-cursor");
+    window.addEventListener("mousemove", function(e){ mx=e.clientX; my=e.clientY; }, {passive:true});
+    var grow=function(){ cur.classList.add("grow"); }, shrink=function(){ cur.classList.remove("grow"); };
+    document.querySelectorAll("a,button,.magnetic").forEach(function(el){ el.addEventListener("mouseenter",grow); el.addEventListener("mouseleave",shrink); });
+  } else if(cur){ cur.style.display="none"; dot.style.display="none"; }
+
+  /* magnetic */
+  var mags=[].slice.call(document.querySelectorAll(".magnetic"));
+  if(fine && !reduce){
+    mags.forEach(function(el){
+      el.addEventListener("mousemove", function(e){ var r=el.getBoundingClientRect(); var x=e.clientX-(r.left+r.width/2), y=e.clientY-(r.top+r.height/2); el.style.transform="translate("+(x*.3).toFixed(1)+"px,"+(y*.4).toFixed(1)+"px)"; });
+      el.addEventListener("mouseleave", function(){ el.style.transform=""; });
+    });
+  }
+
+  /* marquees */
+  var marqs=[].slice.call(document.querySelectorAll(".marq__track")).map(function(t){ return {el:t, dir:parseFloat(t.getAttribute("data-dir"))||1, off:0, half:0}; });
+  function measure(){ marqs.forEach(function(m){ m.half=m.el.scrollWidth/2; }); }
+  measure(); window.addEventListener("resize", measure);
+
+  var lastScroll=window.pageYOffset, vel=0;
+  window.addEventListener("scroll", function(){ var y=window.pageYOffset; vel=y-lastScroll; lastScroll=y; }, {passive:true});
+
+  var track=document.getElementById("proof"), trackRow=track?track.querySelector(".track__row"):null, trackProg=track?track.querySelector(".track__prog i"):null;
+  var paras=[].slice.call(document.querySelectorAll("[data-para]"));
+
+  function tick(){
+    /* cursor lerp */
+    if(fine && !reduce && cur){ cx+=(mx-cx)*.18; cy+=(my-cy)*.18; cur.style.transform="translate("+cx+"px,"+cy+"px)"; dot.style.transform="translate("+mx+"px,"+my+"px)"; }
+    /* marquees with scroll-velocity boost */
+    if(!reduce){ var boost=Math.min(6, Math.abs(vel)*.25); marqs.forEach(function(m){ m.off += (0.55 + boost) * m.dir; if(m.half){ if(m.off>m.half) m.off-=m.half; if(m.off<0) m.off+=m.half; } m.el.style.transform="translate3d("+(-m.off).toFixed(1)+"px,0,0)"; }); vel*=0.9; }
+    /* parallax */
+    if(!reduce){ var vh=innerHeight; paras.forEach(function(el){ var r=el.parentElement.getBoundingClientRect(); var c=(r.top+r.height/2-vh/2)/vh; var sp=parseFloat(el.getAttribute("data-para"))||.1; el.style.transform="translate(-50%,calc(-50% + "+(c*-vh*sp).toFixed(1)+"px))"; }); }
+    /* horizontal track */
+    if(track && trackRow && !reduce){ var total=track.offsetHeight-innerHeight; if(total>0){ var p=Math.min(1,Math.max(0,(-track.getBoundingClientRect().top)/total)); var max=Math.max(0,trackRow.scrollWidth-innerWidth); trackRow.style.transform="translate3d("+(-p*max).toFixed(1)+"px,0,0)"; if(trackProg) trackProg.style.width=(p*100).toFixed(1)+"%"; } }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  /* ---- ambient canvas: living topographic contour lines (à la landonorris.com) ---- */
+  var cv=document.getElementById("amb"), ctx=cv.getContext("2d"), W,H,DPR, CELL, gcols, grows, grid;
+  function size(){ DPR=Math.min(2,window.devicePixelRatio||1); W=cv.clientWidth; H=cv.clientHeight; cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
+    CELL=Math.max(38,Math.min(58,Math.round(W/34))); gcols=Math.ceil(W/CELL)+3; grows=Math.ceil(H/CELL)+3; grid=new Float32Array(gcols*grows); }
+  window.addEventListener("resize", size); size();
+  var LEVELS=[-2.7,-1.8,-0.9,0,0.9,1.8,2.7];
+  /* marching-squares edge pairs: edges top=0 right=1 bottom=2 left=3 */
+  var MS={1:[3,2],2:[2,1],3:[3,1],4:[0,1],5:[0,3,2,1],6:[0,2],7:[0,3],8:[0,3],9:[0,2],10:[0,1,2,3],11:[0,1],12:[3,1],13:[1,2],14:[3,2]};
+  function fld(x,y,T){ return Math.sin(x*0.0060+T*1.5)+Math.sin(y*0.0082-T*1.2)+Math.sin((x+y)*0.0050+T*1.0)+0.6*Math.sin((x-y)*0.0091-T*0.8); }
+  function EP(e,pt,pr,pb,pl){ return e===0?pt:e===1?pr:e===2?pb:pl; }
+  function draw(ts){
+    ctx.clearRect(0,0,W,H);
+    var T=ts*0.00035, ox=(mx/innerWidth-.5)*32, oy=(my/innerHeight-.5)*24, x,y,i,j;
+    for(j=0;j<grows;j++){ for(i=0;i<gcols;i++){ grid[j*gcols+i]=fld(i*CELL-ox, j*CELL-oy, T); } }
+    for(var li=0;li<LEVELS.length;li++){ var L=LEVELS[li];
+      var col=(li===3)?"255,93,46":((li===1||li===5)?"143,190,221":"233,231,222"), a=(li===3)?0.12:((li===1||li===5)?0.09:0.075);
+      ctx.strokeStyle="rgba("+col+","+a+")"; ctx.lineWidth=1.1; ctx.beginPath();
+      for(y=0;y<grows-1;y++){ for(x=0;x<gcols-1;x++){
+        var tl=grid[y*gcols+x], tr=grid[y*gcols+x+1], br=grid[(y+1)*gcols+x+1], bl=grid[(y+1)*gcols+x];
+        var ci=(tl>L?8:0)|(tr>L?4:0)|(br>L?2:0)|(bl>L?1:0); if(ci===0||ci===15) continue;
+        var X=x*CELL, Y=y*CELL;
+        var pt=[X+CELL*(L-tl)/(tr-tl),Y], pr=[X+CELL,Y+CELL*(L-tr)/(br-tr)], pb=[X+CELL*(L-bl)/(br-bl),Y+CELL], pl=[X,Y+CELL*(L-tl)/(bl-tl)];
+        var seg=MS[ci]; for(var s=0;s<seg.length;s+=2){ var pa=EP(seg[s],pt,pr,pb,pl), pz=EP(seg[s+1],pt,pr,pb,pl); ctx.moveTo(pa[0],pa[1]); ctx.lineTo(pz[0],pz[1]); } }
+      }
+      ctx.stroke();
+    }
+  }
+  if(reduce){ draw(0); }
+  else { var run=true; var loop=function(ts){ if(run){ draw(ts||0); requestAnimationFrame(loop); } }; requestAnimationFrame(loop);
+    document.addEventListener("visibilitychange", function(){ run=!document.hidden; if(run) requestAnimationFrame(loop); }); }
+
+  /* ---- lenis (lazy, never blocks paint) ---- */
+  function bindAnchors(useLenis, lenis){
+    document.querySelectorAll('a[href^="#"]').forEach(function(a){
+      a.addEventListener("click", function(e){ var id=a.getAttribute("href"); if(id.length<2) return; var el=document.querySelector(id); if(!el) return;
+        if(useLenis){ e.preventDefault(); lenis.scrollTo(el,{offset:-10}); } setTimeout(closeMenu,60); });
+    });
+  }
+  function initLenis(){ try{ if(reduce||!window.Lenis){ bindAnchors(false); return; }
+      var lenis=new Lenis({duration:1.15, smoothWheel:true, easing:function(t){return Math.min(1,1.001-Math.pow(2,-10*t));}});
+      (function raf(t){ lenis.raf(t); requestAnimationFrame(raf); })(); bindAnchors(true,lenis);
+    }catch(err){ bindAnchors(false); } }
+  if(reduce){ bindAnchors(false); }
+  else{ var ls=document.createElement("script"); ls.src="https://cdnjs.cloudflare.com/ajax/libs/lenis/1.1.14/lenis.min.js"; ls.async=true; ls.onload=initLenis; ls.onerror=function(){ bindAnchors(false); }; document.body.appendChild(ls); }
+})();
+</script>
