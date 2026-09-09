@@ -180,6 +180,8 @@
   .stack__accent .big{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:3.1rem; line-height:1; margin-top:8px; letter-spacing:-.03em}
   .stack__accent .d{font-size:.85rem; margin-top:8px; max-width:26ch; opacity:.95}
   .bonepill{display:inline-block; margin-top:42px; font-family:"Spline Sans Mono",monospace; font-size:.74rem; letter-spacing:.08em; text-transform:uppercase; color:var(--chalk-ink); border-bottom:1px solid var(--pop-deep); padding-bottom:4px}
+  .samb{position:absolute; inset:0; z-index:0; pointer-events:none}
+  .chalk .wrap{position:relative; z-index:1}
 
   /* horizontal scroll-track */
   .track{position:relative; height:340vh; background:var(--ink)}
@@ -311,6 +313,7 @@
 
   <div class="curve" aria-hidden="true"><svg viewBox="0 0 1440 110" preserveAspectRatio="none"><path d="M0,0 C380,92 1060,92 1440,0 L1440,110 L0,110 Z" fill="#EFE7D6"/></svg></div>
   <section class="chalk">
+    <canvas class="samb" aria-hidden="true"></canvas>
     <div class="wrap">
       <div class="eyebrow rl"><span class="n">02</span><span class="label">The engines</span></div>
       <h2 class="mixhead rl"><span class="a">Marker to</span><span class="b">cut plan, in minutes.</span></h2>
@@ -327,7 +330,7 @@
             <span class="pc p" style="grid-area:3/15/6/17"></span>
           </div>
         </div>
-        <div class="stack__accent">
+        <div class="stack__accent plx" data-plx="34">
           <div class="k">Efficiency gain</div>
           <div class="big tnum">+13.4%</div>
           <div class="d">over the hand-built 78% marker — fabric that's simply never cut.</div>
@@ -471,6 +474,7 @@
 
   var track=document.getElementById("proof"), trackRow=track?track.querySelector(".track__row"):null, trackProg=track?track.querySelector(".track__prog i"):null;
   var paras=[].slice.call(document.querySelectorAll("[data-para]"));
+  var plxs=[].slice.call(document.querySelectorAll(".plx"));
 
   function tick(){
     /* cursor lerp */
@@ -478,7 +482,8 @@
     /* marquees with scroll-velocity boost */
     if(!reduce){ var boost=Math.min(6, Math.abs(vel)*.25); marqs.forEach(function(m){ m.off += (0.55 + boost) * m.dir; if(m.half){ if(m.off>m.half) m.off-=m.half; if(m.off<0) m.off+=m.half; } m.el.style.transform="translate3d("+(-m.off).toFixed(1)+"px,0,0)"; }); vel*=0.9; }
     /* parallax */
-    if(!reduce){ var vh=innerHeight; paras.forEach(function(el){ var r=el.parentElement.getBoundingClientRect(); var c=(r.top+r.height/2-vh/2)/vh; var sp=parseFloat(el.getAttribute("data-para"))||.1; el.style.transform="translate(-50%,calc(-50% + "+(c*-vh*sp).toFixed(1)+"px))"; }); }
+    if(!reduce){ var vh=innerHeight; paras.forEach(function(el){ var r=el.parentElement.getBoundingClientRect(); var c=(r.top+r.height/2-vh/2)/vh; var sp=parseFloat(el.getAttribute("data-para"))||.1; el.style.transform="translate(-50%,calc(-50% + "+(c*-vh*sp).toFixed(1)+"px))"; });
+      plxs.forEach(function(el){ var r=el.getBoundingClientRect(); var c=(r.top+r.height/2-vh/2)/vh; var sp=parseFloat(el.getAttribute("data-plx"))||14; el.style.transform="translateY("+(c*-sp).toFixed(1)+"px)"; }); }
     /* horizontal track */
     if(track && trackRow && !reduce){ var total=track.offsetHeight-innerHeight; if(total>0){ var p=Math.min(1,Math.max(0,(-track.getBoundingClientRect().top)/total)); var max=Math.max(0,trackRow.scrollWidth-innerWidth); trackRow.style.transform="translate3d("+(-p*max).toFixed(1)+"px,0,0)"; if(trackProg) trackProg.style.width=(p*100).toFixed(1)+"%"; } }
     requestAnimationFrame(tick);
