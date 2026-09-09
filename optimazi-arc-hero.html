@@ -1,0 +1,149 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Optimazi Arc Reactor Hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{ --pop:#FF5D2E; --ice:#8FBEDD; --fg:#F1EFE8; --dim:#9FA7BC; }
+  *{box-sizing:border-box} a{color:inherit; text-decoration:none}
+  html,body{margin:0; height:100%; background:#080B14; color:var(--fg); font-family:"Hanken Grotesk",system-ui,sans-serif; overflow:hidden}
+  #stage{position:fixed; inset:0; overflow:hidden}
+  #ai{position:absolute; inset:0; display:block; z-index:1}
+  .grain{position:absolute; inset:-50%; z-index:2; pointer-events:none; opacity:.4; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+    animation:grain 5s steps(6) infinite}
+  @keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-4%,3%)}40%{transform:translate(3%,-2%)}60%{transform:translate(-2%,4%)}80%{transform:translate(4%,-3%)}100%{transform:translate(0,0)}}
+  .vig{position:absolute; inset:0; z-index:3; pointer-events:none; box-shadow:inset 0 0 260px 70px rgba(4,6,12,.82)}
+
+  .bar{position:absolute; top:0; left:0; right:0; z-index:6; display:flex; align-items:center; justify-content:space-between; padding:24px clamp(24px,5vw,60px)}
+  .brand{display:flex; align-items:center; gap:12px; font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:1.4rem; letter-spacing:-.02em; color:var(--fg)}
+  .brand .mk{width:28px; height:28px; border:1.5px solid var(--pop); border-radius:8px; display:grid; place-items:center; font-size:.92rem; color:var(--pop)}
+  .brand i{font-style:normal; color:var(--pop)}
+  .cta{font-family:"Spline Sans Mono",monospace; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600; padding:12px 18px; border-radius:999px; background:var(--pop); color:#fff}
+
+  .center{position:absolute; inset:0; z-index:5; display:flex; flex-direction:column; align-items:center; text-align:center; pointer-events:none}
+  .kick{position:absolute; top:clamp(90px,15vh,150px); left:50%; transform:translateX(-50%); font-family:"Spline Sans Mono",monospace; font-size:.72rem; letter-spacing:.22em; text-transform:uppercase; color:var(--dim); display:flex; align-items:center; gap:12px; white-space:nowrap}
+  .kick .d{width:7px; height:7px; border-radius:50%; background:var(--pop); box-shadow:0 0 12px var(--pop)}
+
+  .readout{position:absolute; left:50%; top:46%; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; gap:2px}
+  .readout::before{content:""; position:absolute; width:180px; height:180px; left:50%; top:50%; transform:translate(-50%,-50%);
+    background:radial-gradient(circle, rgba(8,11,20,.72) 0%, rgba(8,11,20,.35) 46%, rgba(8,11,20,0) 70%); border-radius:50%; z-index:-1}
+  .readout .pct{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(1.9rem,3.6vw,2.9rem); letter-spacing:-.03em; color:#EAF4FF; text-shadow:0 0 18px rgba(143,190,221,.7)}
+  .readout .cap{font-family:"Spline Sans Mono",monospace; font-size:.58rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ice)}
+
+  .foot{position:absolute; left:50%; bottom:clamp(56px,12vh,120px); transform:translateX(-50%); width:min(720px,88vw); display:flex; flex-direction:column; align-items:center; gap:26px; pointer-events:auto}
+  .foot h1{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(2rem,5vw,3.6rem); line-height:1; letter-spacing:-.035em; margin:0}
+  .foot h1 em{font-style:italic; color:var(--pop)}
+  .row{display:flex; align-items:center; gap:22px; flex-wrap:wrap; justify-content:center}
+  .btn{font-family:"Spline Sans Mono",monospace; font-size:.76rem; letter-spacing:.06em; text-transform:uppercase; font-weight:600; padding:15px 24px; border-radius:999px; background:var(--pop); color:#fff}
+  .ghost{font-family:"Spline Sans Mono",monospace; font-size:.74rem; letter-spacing:.08em; text-transform:uppercase; color:var(--fg); border-bottom:1px solid var(--ice); padding-bottom:4px}
+  @media (prefers-reduced-motion:reduce){ .grain{animation:none} }
+</style>
+
+<div id="stage">
+  <canvas id="ai" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="vig" aria-hidden="true"></div>
+
+  <header class="bar">
+    <a class="brand" href="#" aria-label="Optimazi"><span class="mk">O</span><span>Optim<i>a</i>zi</span></a>
+    <a class="cta" href="#">Book a demo</a>
+  </header>
+
+  <div class="center">
+    <div class="kick"><span class="d"></span>Optimazi · AI fabric-cost optimizer</div>
+    <div class="readout"><div class="pct" id="eff">88.4%</div><div class="cap">Marker efficiency</div></div>
+    <div class="foot">
+      <h1>Every gram of fabric, <em>accounted for.</em></h1>
+      <div class="row">
+        <a class="btn" href="#">Book a demo</a>
+        <a class="ghost" href="#">See how it works</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var cv=document.getElementById("ai"), ctx=cv.getContext("2d"), W,H,DPR;
+  function size(){ DPR=Math.min(2,window.devicePixelRatio||1); W=innerWidth; H=innerHeight; cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0); }
+  addEventListener("resize", size); size();
+
+  var effVal=88.4; // shared efficiency, drives the ring + readout
+  var eff=document.getElementById("eff");
+  if(!reduce){ setInterval(function(){ effVal=Math.max(87.4, Math.min(89.2, effVal+(Math.random()-0.5)*0.6)); if(eff) eff.textContent=effVal.toFixed(1)+"%"; }, 900); }
+
+  function glow(x,y,r,rgb,a){ var g=ctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,"rgba("+rgb+","+a+")"); g.addColorStop(0.5,"rgba("+rgb+","+(a*0.4)+")"); g.addColorStop(1,"rgba("+rgb+",0)"); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,6.283); ctx.fill(); }
+
+  // ambient diagonal beams (subtle, behind the reactor)
+  var beams=[]; var pal=[[255,93,46],[255,61,110],[143,190,221],[120,150,230],[255,120,60]];
+  for(var i=0;i<5;i++){ beams.push({u:(i+0.5)/5,len:0.5+Math.random()*0.45,wid:70+Math.random()*90,col:pal[i%pal.length],max:0.4+Math.random()*0.35,ph:Math.random()*6.28,sp:0.00016+Math.random()*0.0002,drift:60+Math.random()*70}); }
+  var ANG=-0.62;
+  function drawBeams(t){ var diag=Math.hypot(W,H), nx=Math.cos(ANG+Math.PI/2), ny=Math.sin(ANG+Math.PI/2);
+    for(var i=0;i<beams.length;i++){ var b=beams[i]; var inten=0.4+0.5*Math.sin(t*b.sp*1.3+b.ph);
+      var base=(b.u-0.5)*diag*1.1, off=Math.sin(t*b.sp+b.ph)*b.drift;
+      var cx=W*0.5+nx*(base+off), cy=H*0.5+ny*(base+off); var L=diag*b.len;
+      ctx.save(); ctx.translate(cx,cy); ctx.rotate(ANG); ctx.scale(1,b.wid/L);
+      var rgb=b.col.join(","), g=ctx.createRadialGradient(0,0,0,0,0,L);
+      g.addColorStop(0,"rgba("+rgb+","+(0.7*inten*b.max)+")"); g.addColorStop(0.4,"rgba("+rgb+","+(0.22*inten*b.max)+")"); g.addColorStop(1,"rgba("+rgb+",0)");
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,L,0,6.283); ctx.fill(); ctx.restore();
+    }
+  }
+
+  function ring(r,color,lw){ ctx.beginPath(); ctx.arc(0,0,r,0,6.283); ctx.strokeStyle=color; ctx.lineWidth=lw; ctx.stroke(); }
+
+  function reactor(cx,cy,R,t){
+    var pulse=1+0.06*Math.sin(t*0.0018);
+    ctx.save(); ctx.translate(cx,cy);
+
+    // ---- glow bloom + core (additive) ----
+    ctx.globalCompositeOperation="lighter";
+    glow(0,0,R*2.6,"120,170,230",0.10);
+    glow(0,0,R*1.3,"255,93,46",0.10);
+    glow(0,0,R*0.6*pulse,"180,220,255",0.5);
+    glow(0,0,R*0.28*pulse,"255,255,255",0.75);
+
+    // ---- mechanical structure ----
+    ctx.globalCompositeOperation="source-over";
+    // coils
+    var N=12, rotC=t*0.00015, ri=R*0.42, ro=R*0.72;
+    for(var k=0;k<N;k++){ ctx.save(); ctx.rotate(rotC+k*6.283/N);
+      ctx.beginPath(); ctx.moveTo(ri,-R*0.045); ctx.lineTo(ro,-R*0.088); ctx.lineTo(ro,R*0.088); ctx.lineTo(ri,R*0.045); ctx.closePath();
+      var lg=ctx.createLinearGradient(ri,0,ro,0); lg.addColorStop(0,"rgba(36,46,72,0.95)"); lg.addColorStop(1,"rgba(255,93,46,0.8)");
+      ctx.fillStyle=lg; ctx.fill(); ctx.strokeStyle="rgba(180,220,255,0.45)"; ctx.lineWidth=1; ctx.stroke(); ctx.restore();
+    }
+    // glowing rings
+    ctx.shadowBlur=16; ctx.shadowColor="rgba(143,190,221,0.9)";
+    ring(R*0.40,"rgba(210,235,255,0.9)",2);
+    ring(R*0.76,"rgba(143,190,221,0.55)",2);
+    ctx.shadowBlur=0;
+    // outer steel ring
+    ring(R*0.9,"rgba(120,140,180,0.45)",R*0.055);
+    // outer notches
+    var Mn=54, rotN=t*0.00006; for(var m=0;m<Mn;m++){ ctx.save(); ctx.rotate(rotN+m*6.283/Mn); ctx.fillStyle="rgba(160,190,230,0.22)"; ctx.fillRect(R*0.86,-1,R*0.075,2); ctx.restore(); }
+    // efficiency progress ring
+    var frac=Math.max(0,Math.min(1,effVal/100)), pr=R*1.0;
+    ring(pr,"rgba(120,140,180,0.18)",3);
+    ctx.shadowBlur=14; ctx.shadowColor="rgba(255,93,46,0.9)";
+    ctx.beginPath(); ctx.arc(0,0,pr,-Math.PI/2,-Math.PI/2+6.283*frac); ctx.strokeStyle="#FF5D2E"; ctx.lineWidth=3; ctx.stroke(); ctx.shadowBlur=0;
+    // Stark triangle
+    ctx.shadowBlur=14; ctx.shadowColor="rgba(210,235,255,0.9)"; ctx.strokeStyle="rgba(230,245,255,0.85)"; ctx.lineWidth=2;
+    ctx.beginPath(); for(var a=0;a<3;a++){ var ang=-Math.PI/2+a*2.0944, x=Math.cos(ang)*R*0.26, y=Math.sin(ang)*R*0.26; if(a===0)ctx.moveTo(x,y); else ctx.lineTo(x,y);} ctx.closePath(); ctx.stroke(); ctx.shadowBlur=0;
+
+    ctx.restore();
+  }
+
+  var raf;
+  function frame(ts){ var t=ts||0;
+    ctx.globalCompositeOperation="source-over"; ctx.fillStyle="#080B14"; ctx.fillRect(0,0,W,H);
+    ctx.globalCompositeOperation="lighter"; drawBeams(t);
+    reactor(W*0.5, H*0.46, Math.min(W,H)*0.20, t);
+    ctx.globalCompositeOperation="source-over";
+    if(!reduce) raf=requestAnimationFrame(frame);
+  }
+  if(reduce){ frame(4200); } else { raf=requestAnimationFrame(frame);
+    document.addEventListener("visibilitychange", function(){ if(document.hidden){ cancelAnimationFrame(raf); } else { raf=requestAnimationFrame(frame); } }); }
+})();
+</script>
