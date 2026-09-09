@@ -1,0 +1,159 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Optimazi AI Hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{ --pop:#FF5D2E; --ice:#8FBEDD; --fg:#F1EFE8; --dim:#9FA7BC; }
+  *{box-sizing:border-box}
+  a{color:inherit; text-decoration:none}
+  html,body{margin:0; height:100%; background:#080B14; color:var(--fg); font-family:"Hanken Grotesk",system-ui,sans-serif; overflow:hidden}
+  #stage{position:fixed; inset:0; overflow:hidden}
+  #ai{position:absolute; inset:0; display:block; z-index:1}
+  .grain{position:absolute; inset:-50%; z-index:2; pointer-events:none; opacity:.42; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+    animation:grain 5s steps(6) infinite}
+  @keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-4%,3%)}40%{transform:translate(3%,-2%)}60%{transform:translate(-2%,4%)}80%{transform:translate(4%,-3%)}100%{transform:translate(0,0)}}
+  .scrim{position:absolute; inset:0; z-index:3; pointer-events:none;
+    background:linear-gradient(90deg, rgba(8,11,20,.86) 0%, rgba(8,11,20,.55) 34%, rgba(8,11,20,0) 62%),
+               linear-gradient(0deg, rgba(8,11,20,.7) 0%, rgba(8,11,20,0) 30%)}
+  .vig{position:absolute; inset:0; z-index:3; pointer-events:none; box-shadow:inset 0 0 240px 60px rgba(4,6,12,.8)}
+
+  .bar{position:absolute; top:0; left:0; right:0; z-index:6; display:flex; align-items:center; justify-content:space-between; padding:24px clamp(24px,5vw,60px)}
+  .brand{display:flex; align-items:center; gap:12px; font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:1.4rem; letter-spacing:-.02em}
+  .brand .mk{width:28px; height:28px; border:1.5px solid var(--pop); border-radius:8px; display:grid; place-items:center; font-size:.92rem; color:var(--pop)}
+  .brand i{font-style:normal; color:var(--pop)}
+  .cta{font-family:"Spline Sans Mono",monospace; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600; padding:12px 18px; border-radius:999px; background:var(--pop); color:#fff; text-decoration:none}
+
+  .hero{position:absolute; z-index:5; left:clamp(24px,7vw,110px); top:50%; transform:translateY(-50%); max-width:min(640px,86vw)}
+  .kick{display:flex; align-items:center; gap:12px; margin-bottom:22px; font-family:"Spline Sans Mono",monospace; font-size:.72rem; letter-spacing:.18em; text-transform:uppercase; color:var(--dim)}
+  .kick .d{width:8px; height:8px; border-radius:50%; background:var(--pop); box-shadow:0 0 12px var(--pop)}
+  h1{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(2.6rem,6.4vw,5.2rem); line-height:.98; letter-spacing:-.035em; margin:0}
+  h1 em{font-style:italic; color:var(--pop)}
+  .sub{margin-top:24px; max-width:44ch; font-size:clamp(1.02rem,1.7vw,1.24rem); color:var(--dim)}
+  .row{margin-top:34px; display:flex; align-items:center; gap:22px; flex-wrap:wrap}
+  .btn{font-family:"Spline Sans Mono",monospace; font-size:.76rem; letter-spacing:.06em; text-transform:uppercase; font-weight:600; padding:15px 24px; border-radius:999px; background:var(--pop); color:#fff; text-decoration:none}
+  .ghost{font-family:"Spline Sans Mono",monospace; font-size:.74rem; letter-spacing:.08em; text-transform:uppercase; color:var(--fg); border-bottom:1px solid var(--ice); padding-bottom:4px; text-decoration:none}
+
+  .status{position:absolute; z-index:5; right:clamp(24px,5vw,60px); bottom:clamp(24px,5vw,52px); text-align:right; font-family:"Spline Sans Mono",monospace}
+  .status .l{font-size:.64rem; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); display:flex; align-items:center; gap:8px; justify-content:flex-end}
+  .status .l::before{content:""; width:7px; height:7px; border-radius:50%; background:var(--ice); box-shadow:0 0 10px var(--ice); animation:blink 1.5s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+  .status .n{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(2rem,3.4vw,2.8rem); color:var(--pop); letter-spacing:-.03em; margin-top:4px}
+  @media(max-width:720px){.status{display:none}}
+  @media (prefers-reduced-motion:reduce){ .grain{animation:none} .status .l::before{animation:none} }
+</style>
+
+<div id="stage">
+  <canvas id="ai" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="scrim" aria-hidden="true"></div>
+  <div class="vig" aria-hidden="true"></div>
+
+  <header class="bar">
+    <a class="brand" href="#" aria-label="Optimazi"><span class="mk">O</span><span>Optim<i>a</i>zi</span></a>
+    <a class="cta" href="#">Book a demo</a>
+  </header>
+
+  <div class="hero">
+    <div class="kick"><span class="d"></span>Optimazi · AI fabric-cost optimizer</div>
+    <h1>The AI that finds the fabric <em>you're wasting.</em></h1>
+    <p class="sub">Marka builds the marker, Ultranest nests it — to the best efficiency in the industry, in minutes. It's already thinking.</p>
+    <div class="row">
+      <a class="btn" href="#">Book a demo</a>
+      <a class="ghost" href="#">See how it works</a>
+    </div>
+  </div>
+
+  <div class="status" aria-hidden="true">
+    <div class="l">Ultranest · optimizing marker 04</div>
+    <div class="n tnum" id="eff">88.4%</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var cv=document.getElementById("ai"), ctx=cv.getContext("2d"), W,H,DPR;
+  var mx=0.62, my=0.44; // target core position (fraction)
+  function size(){ DPR=Math.min(2,window.devicePixelRatio||1); W=innerWidth; H=innerHeight; cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0); }
+  addEventListener("resize", size); size();
+  addEventListener("mousemove", function(e){ mx=0.5+(e.clientX/W-0.5)*0.5; my=0.44+(e.clientY/H-0.5)*0.28; }, {passive:true});
+
+  var ANG=-0.62;
+  // diagonal light-beams (Raycast-style), warm-dominant with ice accents
+  var beams=[];
+  var palette=[[255,93,46],[233,70,40],[255,61,110],[143,190,221],[255,120,60],[120,150,230]];
+  for(var i=0;i<7;i++){
+    beams.push({
+      u:(i+0.5)/7,                 // position across the perpendicular axis
+      len:0.55+Math.random()*0.5,  // fraction of diagonal
+      wid:60+Math.random()*90,
+      col:palette[i%palette.length],
+      max:0.6+Math.random()*0.5,
+      ph:Math.random()*6.28,
+      sp:0.00016+Math.random()*0.00022,
+      drift:60+Math.random()*90
+    });
+  }
+  // energy particles drifting toward the core
+  var parts=[]; for(var p=0;p<46;p++){ parts.push({a:Math.random()*6.28, r:0.2+Math.random()*0.6, sp:0.1+Math.random()*0.5, sz:0.6+Math.random()*1.6, tw:Math.random()*6.28}); }
+
+  function glow(x,y,r,rgb,al){ var g=ctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,"rgba("+rgb+","+al+")"); g.addColorStop(0.5,"rgba("+rgb+","+(al*0.4)+")"); g.addColorStop(1,"rgba("+rgb+",0)"); ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,6.283); ctx.fill(); }
+
+  function frame(ts){
+    var t=ts||0;
+    // base
+    ctx.globalCompositeOperation="source-over";
+    ctx.fillStyle="#080B14"; ctx.fillRect(0,0,W,H);
+
+    ctx.globalCompositeOperation="lighter";
+    var diag=Math.hypot(W,H);
+    var nx=Math.cos(ANG+Math.PI/2), ny=Math.sin(ANG+Math.PI/2); // perpendicular direction
+    for(var i=0;i<beams.length;i++){ var b=beams[i];
+      var inten=0.45+0.55*Math.sin(t*b.sp*1.4+b.ph);
+      // center placed across the perpendicular axis, sweeping slowly
+      var base=(b.u-0.5)*diag*1.15;
+      var off=Math.sin(t*b.sp+b.ph)*b.drift;
+      var cx=W*0.5 + nx*(base+off);
+      var cy=H*0.5 + ny*(base+off) + Math.cos(t*b.sp*0.7+b.ph)*b.drift*0.4;
+      var L=diag*b.len*(0.85+0.15*Math.sin(t*b.sp*0.9+b.ph));
+      ctx.save(); ctx.translate(cx,cy); ctx.rotate(ANG); ctx.scale(1,b.wid/L);
+      var rgb=b.col.join(",");
+      var g=ctx.createRadialGradient(0,0,0,0,0,L);
+      g.addColorStop(0,"rgba("+rgb+","+(0.9*inten*b.max)+")");
+      g.addColorStop(0.35,"rgba("+rgb+","+(0.32*inten*b.max)+")");
+      g.addColorStop(1,"rgba("+rgb+",0)");
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,L,0,6.283); ctx.fill(); ctx.restore();
+    }
+
+    // AI core
+    var ccx=W*mx, ccy=H*my, base=Math.min(W,H)*0.15, pulse=1+0.09*Math.sin(t*0.0016);
+    glow(ccx,ccy, base*3.0*pulse, "143,190,221", 0.09);      // ice halo
+    glow(ccx,ccy, base*1.9*pulse, "255,93,46", 0.16);        // persimmon body
+    // orbiting liquid blobs
+    for(var k=0;k<4;k++){ var a=t*(0.0006+k*0.00018)+k*1.7; var rr=base*(0.42+0.12*Math.sin(t*0.0011+k));
+      var bx=ccx+Math.cos(a)*rr, by=ccy+Math.sin(a)*rr*0.82;
+      glow(bx,by, base*0.9, k%2? "255,61,110":"255,150,90", 0.22); }
+    glow(ccx,ccy, base*0.85*pulse, "255,205,170", 0.4);      // hot inner
+    glow(ccx,ccy, base*0.32*pulse, "255,255,255", 0.55);     // white core
+
+    // particles spiraling in
+    for(var q=0;q<parts.length;q++){ var P=parts[q];
+      var ang=P.a + t*0.0002*P.sp*8; var rad=(0.12+ (0.5*(1+Math.sin(t*0.0001*P.sp*10+P.tw))/1))*base*3;
+      var px=ccx+Math.cos(ang)*rad, py=ccy+Math.sin(ang)*rad*0.85;
+      var tw=0.4+0.6*Math.abs(Math.sin(t*0.002*P.sp+P.tw));
+      glow(px,py, P.sz*2.2, "200,220,255", 0.5*tw*(1-rad/(base*3.2)));
+    }
+    if(!reduce) raf=requestAnimationFrame(frame);
+  }
+  var raf;
+  if(reduce){ frame(4200); } else { raf=requestAnimationFrame(frame);
+    document.addEventListener("visibilitychange", function(){ if(document.hidden){ cancelAnimationFrame(raf); } else { raf=requestAnimationFrame(frame); } }); }
+
+  // efficiency flicker (AI "thinking")
+  var eff=document.getElementById("eff");
+  if(eff && !reduce){ setInterval(function(){ var v=(87.6+Math.random()*1.4).toFixed(1); eff.textContent=v+"%"; }, 900); }
+})();
+</script>
