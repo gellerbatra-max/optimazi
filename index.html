@@ -225,36 +225,41 @@
   .cta .pill{display:inline-block; margin-top:34px; font-size:.82rem; padding:16px 28px}
 
   /* ---- mega footer (Lando-style, persimmon frame) ---- */
-  .megafoot{position:relative; z-index:2; background:#FF5D2E; padding:clamp(34px,4vw,64px) 0}
+  .megafoot{position:relative; z-index:2; background:#FF5D2E; background:linear-gradient(to top, #FF5D2E 0%, #FF7A48 32%, #FFBD95 64%, #FCF6F0 100%); padding:clamp(34px,4vw,64px) 0}
   .megafoot__shape{display:none}
-  .megafoot__panel{--rise:clamp(15px,1.9vw,24px); position:relative; z-index:1; color:#F4F4ED; padding:clamp(38px,4.4vw,78px) clamp(30px,5vw,64px) clamp(34px,4vw,66px); transform:scale(.94); transform-origin:top center}
+  .megafoot__panel{--rise:clamp(15px,1.9vw,24px); --pt:clamp(30px,3.2vw,50px); --pb:clamp(120px,10.5vw,196px); position:relative; z-index:1; color:#F4F4ED; padding:var(--pt) clamp(30px,5vw,64px) var(--pb); transform:scale(.94); transform-origin:top center}
   .megafoot__frame{position:absolute; left:0; top:calc(-1*var(--rise)); width:100%; height:calc(100% + 2*var(--rise)); z-index:0; overflow:visible; pointer-events:none}
-  .megafoot__frame path{fill:#111112; stroke:none}
+  .megafoot__frame path{fill:#0E0E0D; stroke:none}
+  .megafoot__tex{position:absolute; left:0; top:calc(-1*var(--rise)); width:100%; height:calc(100% + 2*var(--rise)); z-index:1; pointer-events:none}
+  .megafoot__ftex{position:absolute; inset:0; z-index:0; pointer-events:none}
   .megafoot .mf-w{position:relative; z-index:3; max-width:1180px; margin:0 auto}
-  .megafoot__top{display:flex; justify-content:space-between; align-items:flex-start}
+  .megafoot__top{position:absolute; top:clamp(12px,1.4vw,20px); left:clamp(14px,1.8vw,26px); z-index:5; display:flex; align-items:flex-start}
   .megafoot__word{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(1.4rem,3vw,2rem); line-height:.85; letter-spacing:-.03em; color:#F4F4ED}
   .megafoot__word span{color:transparent; -webkit-text-stroke:1.3px rgba(244,244,237,.45)}
   .megafoot__store{font-family:"Spline Sans Mono",monospace; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600; padding:11px 18px; border-radius:999px; background:var(--pop); color:#111112; white-space:nowrap}
-  .megafoot__hl{text-align:center; margin-top:clamp(2px,1vw,12px)}
+  .megafoot__hl{text-align:center; margin-top:clamp(-10px,-0.6vw,-2px)}
   .megafoot__sig{display:block; margin:0 auto 4px; width:clamp(130px,18vw,220px); height:auto; color:var(--pop)}
   .megafoot__hl h2{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(1.5rem,4.3vw,2.9rem); line-height:.92; letter-spacing:-.03em; text-transform:uppercase; color:#F4F4ED; margin:0}
   .megafoot__hl em{font-style:normal; color:var(--pop)}
-  .megafoot__mid{display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:clamp(16px,3vw,40px); margin-top:clamp(-14px,-1vw,-4px)}
+  .megafoot__mid{display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:clamp(16px,3vw,40px); margin-top:clamp(-14px,-1vw,-4px); transform:translateY(calc(var(--pb) - 100px))}
   @media(max-width:820px){.megafoot__mid{grid-template-columns:1fr}}
-  .megafoot__col h4{font-family:"Spline Sans Mono",monospace; font-size:.64rem; letter-spacing:.16em; text-transform:uppercase; color:#7C7E72; margin:0 0 16px}
-  .megafoot__col a{display:block; font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(.98rem,1.5vw,1.18rem); letter-spacing:-.02em; color:#F4F4ED; margin-bottom:4px; width:fit-content}
+  .megafoot__col h4{font-family:"Spline Sans Mono",monospace; font-size:.92rem; letter-spacing:.16em; text-transform:uppercase; color:#7C7E72; margin:0 0 18px}
+  .megafoot__col a{display:block; font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(1.2rem,2vw,1.6rem); letter-spacing:-.02em; color:#F4F4ED; margin-bottom:7px; width:fit-content}
   .megafoot__col.right{text-align:right} .megafoot__col.right a{margin-left:auto}
   .megafoot__col a:hover{color:var(--pop)} .megafoot__col a.mm{color:var(--pop)}
   @media(max-width:820px){.megafoot__col,.megafoot__col.right{text-align:center; order:3} .megafoot__col a,.megafoot__col.right a{margin-left:auto; margin-right:auto}}
-  .megafoot__vid{width:clamp(130px,17vw,200px); aspect-ratio:1/1; margin:0 auto; position:relative; z-index:4}
+  .megafoot__vid{width:clamp(300px,34vw,470px); aspect-ratio:1/1; margin:0 auto; position:relative; z-index:4}
   @media(max-width:820px){.megafoot__vid{order:1; margin-bottom:16px}}
   .megafoot__vid video{width:100%; height:100%; object-fit:cover; border-radius:22px; filter:saturate(1.06);
     -webkit-mask-image:radial-gradient(ellipse 60% 60% at 50% 50%, #000 54%, transparent 86%); mask-image:radial-gradient(ellipse 60% 60% at 50% 50%, #000 54%, transparent 86%)}
-  .megafoot__enq{text-align:center; margin-top:clamp(4px,1.2vw,14px)}
-  .megafoot__pill{display:inline-flex; align-items:center; gap:10px; font-family:"Spline Sans Mono",monospace; font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600; padding:15px 26px; border-radius:999px; background:var(--pop); color:#111112}
+  .megafoot__enq{position:absolute; left:0; right:0; bottom:calc(14px - var(--pb)); text-align:center; z-index:3}
+  .megafoot__pill{display:inline-flex; align-items:center; gap:10px; font-family:"Spline Sans Mono",monospace; font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600; padding:15px 26px; border-radius:999px; background:var(--pop); color:#F4F4ED}
   .megafoot__logos{display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:clamp(20px,4vw,46px); margin-top:clamp(12px,1.6vw,22px); padding-top:clamp(10px,1.4vw,16px); border-top:1px solid rgba(244,244,237,.1)}
   .megafoot__logos span{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(.9rem,1.6vw,1.15rem); letter-spacing:-.01em; color:rgba(244,244,237,.42)}
   .megafoot__bot{display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-top:clamp(12px,1.5vw,20px); font-family:"Spline Sans Mono",monospace; font-size:.7rem; color:#7C7E72}
+  .megafoot__legal{position:absolute; right:clamp(22px,4vw,60px); bottom:clamp(9px,1.3vw,18px); z-index:4; display:flex; align-items:center; gap:10px; font-family:"Spline Sans Mono",monospace; font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; color:#1c0a02}
+  .megafoot__legal a{color:#1c0a02} .megafoot__legal a:hover{color:#000}
+  .megafoot__copy{position:absolute; left:clamp(22px,4vw,60px); bottom:clamp(9px,1.3vw,18px); z-index:4; font-family:"Spline Sans Mono",monospace; font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; color:#1c0a02; line-height:1.55}
   .megafoot__bot a:hover{color:var(--pop)}
   @media(max-width:600px){.megafoot__panel{--rise:13px}}
 
@@ -463,14 +468,12 @@
   <!-- FOOTER -->
   <footer class="megafoot">
     <div class="megafoot__panel">
+      <div class="megafoot__top">
+        <div class="megafoot__word">OPTI<span>MAZI</span></div>
+      </div>
       <div class="mf-w">
-        <div class="megafoot__top">
-          <div class="megafoot__word">OPTI<span>MAZI</span></div>
-          <a class="megafoot__store" href="mailto:info@gelianfashion.com">Book a demo</a>
-        </div>
         <div class="megafoot__hl">
-          <svg class="megafoot__sig" viewBox="0 0 220 54" fill="none" aria-hidden="true"><path d="M6,38 C34,8 52,48 78,30 C96,18 104,44 126,32 C150,19 168,42 192,24 C204,15 212,26 214,30" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
-          <h2>Every gram of <em>fabric</em>,<br>accounted <em>for</em>.</h2>
+          <h2>Fighting to utilize every inch of <em>Fabric</em><br>Improved <em>Profitability</em></h2>
         </div>
         <div class="megafoot__mid">
           <nav class="megafoot__col" aria-label="Pages">
@@ -480,10 +483,9 @@
             <a href="our-story.html">Our Story</a>
             <a href="invest.html">Invest</a>
             <a href="contact.html">Contact</a>
-            <a class="mm" href="mailto:info@gelianfashion.com">Book a demo</a>
           </nav>
           <div class="megafoot__vid">
-            <video autoplay muted loop playsinline preload="auto"><source src="videos/2.mp4" type="video/mp4"></video>
+            <video autoplay muted loop playsinline preload="auto"><source src="videos/3.mp4" type="video/mp4"></video>
           </div>
           <nav class="megafoot__col right" aria-label="Social">
             <h4>Follow on</h4>
@@ -494,10 +496,10 @@
           </nav>
         </div>
         <div class="megafoot__enq"><a class="megafoot__pill" href="mailto:info@gelianfashion.com">Business enquiries <span>↗</span></a></div>
-        <div class="megafoot__logos"><span>Marka</span><span>Ultranest</span><span>Pattern Studio</span><span>PLM</span><span>Roll Manager</span><span>Cut Planning</span></div>
-        <div class="megafoot__bot"><span>© <span id="yr">2026</span> Gelian (Pvt) Ltd. All rights reserved.</span><span><a href="#">Privacy Policy</a> · <a href="#">Terms</a></span></div>
       </div>
     </div>
+    <div class="megafoot__copy">© <span id="yr">2026</span> Gelian (Pvt) Ltd<br>All rights reserved.</div>
+    <div class="megafoot__legal"><a href="#">Privacy Policy</a><span aria-hidden="true">·</span><a href="#">Terms</a></div>
   </footer>
   </div><!-- /.content -->
 </main>
@@ -523,6 +525,37 @@
     svg.setAttribute("class","megafoot__frame"); svg.setAttribute("preserveAspectRatio","none"); svg.setAttribute("aria-hidden","true");
     var path=document.createElementNS(NS,"path"); path.setAttribute("vector-effect","non-scaling-stroke");
     svg.appendChild(path); panel.insertBefore(svg, panel.firstChild);
+
+    /* topographic texture — light contours over the olive card, dark contours shading the orange frame */
+    var mfoot=panel.parentElement;
+    function contours(ctx, W, H, mainCol, zeroCol){
+      var DPR=Math.min(2, window.devicePixelRatio||1);
+      ctx.canvas.width=W*DPR; ctx.canvas.height=H*DPR; ctx.canvas.style.width=W+"px"; ctx.canvas.style.height=H+"px";
+      ctx.setTransform(DPR,0,0,DPR,0,0); ctx.clearRect(0,0,W,H);
+      var MS={1:[3,2],2:[2,1],3:[3,1],4:[0,1],5:[0,3,2,1],6:[0,2],7:[0,3],8:[0,3],9:[0,2],10:[0,1,2,3],11:[0,1],12:[3,1],13:[1,2],14:[3,2]};
+      function EP(e,pt,pr,pb,pl){return e===0?pt:e===1?pr:e===2?pb:pl;}
+      var CELL=Math.max(30,Math.min(48,Math.round(W/26)));
+      var gc=Math.ceil(W/CELL)+3, gr=Math.ceil(H/CELL)+3, g=new Float32Array(gc*gr),i,j,x,y;
+      for(j=0;j<gr;j++){ for(i=0;i<gc;i++){ x=i*CELL; y=j*CELL; g[j*gc+i]=Math.sin(x*.006)+Math.sin(y*.0082)+Math.sin((x+y)*.005)+.6*Math.sin((x-y)*.0091); } }
+      var LEV=[-2.7,-1.8,-.9,0,.9,1.8,2.7],li,L;
+      for(li=0;li<LEV.length;li++){ L=LEV[li];
+        ctx.strokeStyle=(li===3)?zeroCol:mainCol; ctx.lineWidth=1.1; ctx.beginPath();
+        for(y=0;y<gr-1;y++){ for(x=0;x<gc-1;x++){
+          var tl=g[y*gc+x],tr=g[y*gc+x+1],br=g[(y+1)*gc+x+1],bl=g[(y+1)*gc+x];
+          var ci=(tl>L?8:0)|(tr>L?4:0)|(br>L?2:0)|(bl>L?1:0); if(ci===0||ci===15) continue;
+          var X=x*CELL,Y=y*CELL,
+            pt=[X+CELL*(L-tl)/(tr-tl),Y], pr=[X+CELL,Y+CELL*(L-tr)/(br-tr)],
+            pb=[X+CELL*(L-bl)/(br-bl),Y+CELL], pl=[X,Y+CELL*(L-tl)/(bl-tl)];
+          var seg=MS[ci],si; for(si=0;si<seg.length;si+=2){ var a=EP(seg[si],pt,pr,pb,pl),z=EP(seg[si+1],pt,pr,pb,pl); ctx.moveTo(a[0],a[1]); ctx.lineTo(z[0],z[1]); } }
+        }
+        ctx.stroke();
+      }
+    }
+    var ctex=document.createElement("canvas"); ctex.className="megafoot__tex"; ctex.setAttribute("aria-hidden","true");
+    panel.insertBefore(ctex, svg.nextSibling); var cctx=ctex.getContext("2d");
+    var ftex=document.createElement("canvas"); ftex.className="megafoot__ftex"; ftex.setAttribute("aria-hidden","true");
+    if(mfoot) mfoot.insertBefore(ftex, mfoot.firstChild); var fctx=ftex.getContext("2d");
+
     function build(){
       var W=panel.clientWidth, H=panel.clientHeight; if(!W||!H) return;
       var rise=parseFloat(getComputedStyle(panel).getPropertyValue("--rise"))||20;
@@ -541,6 +574,10 @@
       path.setAttribute("d",d);
       var sc = parseFloat((getComputedStyle(panel).transform.match(/matrix\(\s*([-\d.]+)/)||[0,0.94])[1]) || 0.94;
       panel.style.marginBottom = Math.round(-(1-sc) * H) + "px"; /* reclaim the space the scale leaves below */
+      contours(cctx, W, TH, "rgba(244,244,237,.06)", "rgba(255,93,46,.09)");
+      ctex.style.clipPath = "path('"+d+"')"; ctex.style.webkitClipPath = "path('"+d+"')";
+      var MW = mfoot ? mfoot.clientWidth : 0, MH = mfoot ? mfoot.clientHeight : 0;
+      if(MW && MH) contours(fctx, MW, MH, "rgba(28,12,4,.05)", "rgba(28,12,4,.07)");
     }
     build();
     if("ResizeObserver" in window){ new ResizeObserver(build).observe(panel); }
