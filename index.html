@@ -38,7 +38,8 @@
   .menu i{display:block; width:18px; height:1.6px; background:var(--fg)}
 
   /* ---------------- HERO ---------------- */
-  .hero{position:relative; z-index:1; height:100svh; min-height:640px; overflow:hidden}
+  .hero{position:fixed; inset:0; z-index:1; height:100svh; min-height:640px; overflow:hidden}
+  .hero__fade{position:absolute; inset:0; z-index:7; background:var(--bg); opacity:0; pointer-events:none}
   .core{position:absolute; left:50%; top:46%; transform:translate(-50%,-50%); z-index:1; width:min(1040px,98vw); aspect-ratio:16/9; max-height:80vh; pointer-events:none}
   .core > *{position:absolute; inset:0}
   .core .aura{background:radial-gradient(circle at 50% 50%, rgba(255,93,46,.13) 0%, rgba(143,190,221,.06) 30%, transparent 56%); z-index:0}
@@ -73,6 +74,15 @@
   .brc a{display:inline-block; margin-top:8px; font-size:.74rem; letter-spacing:.06em; text-transform:uppercase; color:var(--fg); border-bottom:1px solid var(--pop); padding-bottom:3px}
   @media(max-width:720px){ .brc{display:none} }
   .scrollcue{position:absolute; z-index:6; left:50%; bottom:14px; transform:translateX(-50%); font-family:"Spline Sans Mono",monospace; font-size:.6rem; letter-spacing:.2em; text-transform:uppercase; color:var(--faint)}
+
+  /* content page reveals over the fixed hero, on a bone ground (dark -> light on scroll) */
+  .content{position:relative; z-index:2; margin-top:100svh; border-radius:34px 34px 0 0; box-shadow:0 -30px 80px -14px rgba(0,0,0,.6); overflow:hidden;
+    --bg:#EBE7DB; --ink-2:#F4F0E5; --ink-3:#E8E3D4; --sunk:#E1DCCD; --fg:#191A10; --dim:#585849; --faint:#8A8A77; --line:rgba(25,26,16,.15); --line-2:rgba(25,26,16,.06);
+    background:var(--bg); color:var(--fg)}
+  /* product "screens" + closing bands stay dark on the bone page */
+  .content .nest, .content .mock, .content .track, .content .cta, .content .footer{
+    --bg:#09121E; --ink-2:#0E1826; --ink-3:#141F30; --sunk:#070E18; --fg:#EAF2FA; --dim:#8FA3B8; --faint:#5E6C86; --line:rgba(233,242,250,.12); --line-2:rgba(233,242,250,.06)}
+  .content .track, .content .cta, .content .footer{background:var(--bg); color:var(--fg)}
 
   /* ---------------- SECTIONS ---------------- */
   section.blk{position:relative; z-index:1; background:var(--bg); padding:clamp(72px,11vw,150px) 0; border-top:1px solid var(--line-2)}
@@ -259,8 +269,10 @@
     </aside>
     <div class="brc"><div class="l">Marker to cut plan · minutes</div><a href="#solutions">See how it works →</a></div>
     <div class="scrollcue">Scroll</div>
+    <div class="hero__fade" id="heroFade" aria-hidden="true"></div>
   </section>
 
+  <div class="content">
   <!-- MARQUEE -->
   <div class="marq" aria-hidden="true"><div class="marq__track" data-dir="1"><span>Marker making<i class="dot"></i><b>Nesting</b><i class="dot"></i>Cut planning<i class="dot"></i><i>Roll matching</i><i class="dot"></i>PLM &amp; BOM<i class="dot"></i>Marker making<i class="dot"></i><b>Nesting</b><i class="dot"></i>Cut planning<i class="dot"></i><i>Roll matching</i><i class="dot"></i>PLM &amp; BOM<i class="dot"></i></span></div></div>
 
@@ -420,15 +432,17 @@
     </div>
     <div class="footer__bot"><span>© <span id="yr">2026</span> Gelian (Pvt) Ltd. All rights reserved.</span><span>Marker making · Nesting · Cut planning</span></div>
   </div></footer>
+  </div><!-- /.content -->
 </main>
 
 <script>
 (function(){
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* nav bg on scroll */
-  var bar=document.getElementById("bar");
-  addEventListener("scroll", function(){ bar.classList.toggle("scrolled", window.pageYOffset>60); }, {passive:true});
+  /* nav bg on scroll + hero dim as the bone page rises over it */
+  var bar=document.getElementById("bar"), heroFade=document.getElementById("heroFade");
+  addEventListener("scroll", function(){ bar.classList.toggle("scrolled", window.pageYOffset>60);
+    if(heroFade){ heroFade.style.opacity=(Math.min(1, window.pageYOffset/innerHeight)*0.5).toFixed(3); } }, {passive:true});
 
   /* year */
   var yr=document.getElementById("yr"); if(yr) yr.textContent=new Date().getFullYear();
