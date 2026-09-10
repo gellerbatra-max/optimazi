@@ -19,8 +19,7 @@
   var foot = document.createElement("footer");
   foot.className = "megafoot";
   foot.innerHTML =
-    '<div class="megafoot__shape" aria-hidden="true"><svg viewBox="0 0 1200 560" preserveAspectRatio="none"><path d="M44,34 L558,34 C572,34 572,13 588,13 L612,13 C628,13 628,34 642,34 L1156,34 Q1200,34 1200,78 L1200,482 Q1200,526 1156,526 L642,526 C628,526 628,547 612,547 L588,547 C572,547 572,526 558,526 L44,526 Q0,526 0,482 L0,78 Q0,34 44,34 Z" fill="#0B0F16" stroke="#FF5D2E" stroke-width="4" vector-effect="non-scaling-stroke"/></svg></div>'
-  +   '<div class="megafoot__panel">'
+      '<div class="megafoot__panel">'
   +   '<div class="mf-w">'
   +     '<div class="megafoot__top"><div class="megafoot__word">OPTI<span>MAZI</span></div>'
   +       '<a class="megafoot__store" href="contact.html">Book a demo</a></div>'
@@ -42,6 +41,49 @@
   +   '</div>'
   + '</div>';
   document.body.appendChild(foot);
+
+  /* footer panel outline — drawn as a real path sized to the panel's pixels,
+     so straight edges stretch but the top/bottom-centre tabs + corners stay fixed */
+  (function(){
+    var panel = foot.querySelector(".megafoot__panel"); if(!panel) return;
+    var NS = "http://www.w3.org/2000/svg";
+    var svg = document.createElementNS(NS,"svg");
+    svg.setAttribute("class","megafoot__frame"); svg.setAttribute("preserveAspectRatio","none"); svg.setAttribute("aria-hidden","true");
+    var path = document.createElementNS(NS,"path"); path.setAttribute("vector-effect","non-scaling-stroke");
+    svg.appendChild(path); panel.insertBefore(svg, panel.firstChild);
+    function build(){
+      var W = panel.clientWidth, H = panel.clientHeight; if(!W || !H) return;
+      var rise = parseFloat(getComputedStyle(panel).getPropertyValue("--rise")) || 20;
+      var st = 2, R = 13, cx = W/2, TH = H + 2*rise;
+      var tH = Math.max(120, Math.min(300, W*0.30))/2, bH = Math.max(200, Math.min(480, W*0.46))/2, s = Math.min(30, W*0.028);
+      var L = st, Rt = W - st, yTop = st, yT = rise, yB = rise + H, yBot = TH - st;
+      var d = "M"+L+","+(yT+R)
+        + "Q"+L+","+yT+" "+(L+R)+","+yT
+        + "L"+(cx-tH-s)+","+yT
+        + "C"+(cx-tH-s*0.45)+","+yT+" "+(cx-tH-s*0.55)+","+yTop+" "+(cx-tH)+","+yTop
+        + "L"+(cx+tH)+","+yTop
+        + "C"+(cx+tH+s*0.55)+","+yTop+" "+(cx+tH+s*0.45)+","+yT+" "+(cx+tH+s)+","+yT
+        + "L"+(Rt-R)+","+yT
+        + "Q"+Rt+","+yT+" "+Rt+","+(yT+R)
+        + "L"+Rt+","+(yB-R)
+        + "Q"+Rt+","+yB+" "+(Rt-R)+","+yB
+        + "L"+(cx+bH+s)+","+yB
+        + "C"+(cx+bH+s*0.45)+","+yB+" "+(cx+bH+s*0.55)+","+yBot+" "+(cx+bH)+","+yBot
+        + "L"+(cx-bH)+","+yBot
+        + "C"+(cx-bH-s*0.55)+","+yBot+" "+(cx-bH-s*0.45)+","+yB+" "+(cx-bH-s)+","+yB
+        + "L"+(L+R)+","+yB
+        + "Q"+L+","+yB+" "+L+","+(yB-R)
+        + "Z";
+      svg.setAttribute("viewBox","0 0 "+W+" "+TH);
+      svg.setAttribute("width",W); svg.setAttribute("height",TH);
+      path.setAttribute("d",d);
+    }
+    build();
+    if("ResizeObserver" in window){ new ResizeObserver(build).observe(panel); }
+    window.addEventListener("resize", build);
+    window.addEventListener("load", build);
+    setTimeout(build,300); setTimeout(build,1200);
+  })();
 
   /* mark current page active in footer + highlight */
   var here = (location.pathname.split("/").pop() || "index.html").toLowerCase();
