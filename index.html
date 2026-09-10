@@ -1,0 +1,509 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Optimazi — AI fabric-cost optimizer</title>
+<meta name="description" content="Optimazi by Gelian — a human intuition-driven, AI-powered fabric-cost optimizer. Marka builds the marker, Ultranest nests it to the best efficiency in the industry, browser-native.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#09121E; --ink-2:#0E1826; --ink-3:#141F30; --sunk:#070E18;
+    --fg:#EAF2FA; --dim:#8FA3B8; --faint:#5E6C86;
+    --pop:#FF5D2E; --pop-deep:#E8461C; --ice:#7FC4FF;
+    --line:rgba(233,242,250,.12); --line-2:rgba(233,242,250,.06);
+    --maxw:1200px;
+  }
+  *{box-sizing:border-box} a{color:inherit; text-decoration:none}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+  body{margin:0; background:var(--bg); color:var(--fg); font-family:"Hanken Grotesk",system-ui,sans-serif; line-height:1.6; overflow-x:clip; -webkit-font-smoothing:antialiased}
+  h1,h2,h3,.disp{font-family:"Bricolage Grotesque","Hanken Grotesk",sans-serif; font-weight:700; margin:0; line-height:1; letter-spacing:-.02em; text-wrap:balance}
+  .mono{font-family:"Spline Sans Mono",ui-monospace,monospace}
+  .tnum{font-variant-numeric:tabular-nums}
+  ::selection{background:var(--pop); color:#fff}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 clamp(22px,5vw,56px)}
+
+  /* fixed ambient contour background (behind hero) */
+  #cont{position:fixed; inset:0; z-index:0; display:block; pointer-events:none}
+
+  /* nav */
+  .bar{position:fixed; top:0; left:0; right:0; z-index:40; display:flex; align-items:center; justify-content:space-between; padding:20px clamp(20px,5vw,56px); transition:background .3s, backdrop-filter .3s, padding .3s}
+  .bar.scrolled{background:rgba(9,18,30,.72); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); padding-top:14px; padding-bottom:14px; border-bottom:1px solid var(--line)}
+  .navbrand{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:1.25rem; letter-spacing:-.02em; opacity:0; transition:opacity .3s}
+  .bar.scrolled .navbrand{opacity:1} .navbrand span{color:var(--pop)}
+  .pill{font-family:"Spline Sans Mono",monospace; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600; padding:12px 18px; border-radius:999px; background:var(--pop); color:#fff; white-space:nowrap; transition:background .25s, transform .25s}
+  .pill:hover{background:var(--pop-deep); transform:translateY(-1px)}
+  .bar__r{display:flex; align-items:center; gap:12px}
+  .menu{width:46px; height:46px; border:1.4px solid var(--line); border-radius:11px; display:grid; place-items:center; gap:5px; background:rgba(233,242,250,.03); cursor:pointer}
+  .menu i{display:block; width:18px; height:1.6px; background:var(--fg)}
+
+  /* ---------------- HERO ---------------- */
+  .hero{position:relative; z-index:1; height:100svh; min-height:640px; overflow:hidden}
+  .core{position:absolute; left:50%; top:46%; transform:translate(-50%,-50%); z-index:1; width:min(1040px,98vw); aspect-ratio:16/9; max-height:80vh; pointer-events:none}
+  .core > *{position:absolute; inset:0}
+  .core .aura{background:radial-gradient(circle at 50% 50%, rgba(255,93,46,.13) 0%, rgba(143,190,221,.06) 30%, transparent 56%); z-index:0}
+  .core video{width:100%; height:100%; object-fit:cover; z-index:1; filter:saturate(1.14) contrast(1.06) brightness(1.05);
+    -webkit-mask-image:radial-gradient(ellipse 58% 58% at 50% 50%, #000 34%, rgba(0,0,0,.5) 60%, transparent 82%);
+    mask-image:radial-gradient(ellipse 58% 58% at 50% 50%, #000 34%, rgba(0,0,0,.5) 60%, transparent 82%)}
+  .mark{position:absolute; z-index:4; top:clamp(20px,3.4vh,48px); left:50%; transform:translateX(-50%); text-align:center; width:100%}
+  .mark h1{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(3.4rem,13vw,9.5rem); line-height:.82; letter-spacing:-.05em; color:var(--fg)}
+  .mark h1 span{color:transparent; -webkit-text-stroke:1.4px rgba(234,242,250,.45); text-stroke:1.4px rgba(234,242,250,.45)}
+  .tagline{position:absolute; z-index:5; left:50%; top:83.5%; transform:translateX(-50%); width:min(860px,94vw); text-align:center}
+  .tagline__top{font-family:"Hanken Grotesk",sans-serif; font-weight:500; font-size:clamp(.92rem,1.7vw,1.22rem); color:var(--dim); letter-spacing:.02em}
+  .tagline__top .sep{color:var(--pop); margin:0 .6em; font-weight:600}
+  .tagline__main{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(1.7rem,3.8vw,2.8rem); color:var(--fg); letter-spacing:-.02em; line-height:1; margin-top:.4em}
+
+  .ticket{position:absolute; z-index:6; left:clamp(18px,4vw,48px); bottom:clamp(24px,6vh,56px); width:min(300px,76vw); color:var(--fg); transform:scale(.84); transform-origin:left bottom}
+  .ticket__shape{position:absolute; inset:0; width:100%; height:100%; z-index:0; filter:drop-shadow(0 26px 58px rgba(0,0,0,.62))}
+  .ticket__hd{position:relative; z-index:1; display:flex; justify-content:space-between; align-items:center; padding:40px 18px 13px; margin:0 2px; border-bottom:1px dashed rgba(233,242,250,.14)}
+  .ticket__hd .t{font-family:"Spline Sans Mono",monospace; font-size:.62rem; letter-spacing:.18em; text-transform:uppercase; color:var(--faint)}
+  .ticket__hd .live{font-family:"Spline Sans Mono",monospace; font-size:.6rem; color:var(--pop); display:flex; align-items:center; gap:6px}
+  .ticket__hd .live::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--pop); box-shadow:0 0 8px var(--pop); animation:bk 1.5s infinite}
+  @keyframes bk{0%,100%{opacity:1}50%{opacity:.3}}
+  .ticket__b{position:relative; z-index:1; padding:15px 18px 34px}
+  .ticket__mk{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:1.12rem; letter-spacing:-.01em}
+  .ticket__eff{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:2.7rem; line-height:1; color:var(--pop); margin-top:2px; letter-spacing:-.03em}
+  .ticket__rows{margin-top:12px; display:grid; gap:8px}
+  .ticket__rows .r{display:flex; justify-content:space-between; font-size:.8rem; padding-bottom:8px; border-bottom:1px dotted rgba(233,242,250,.12)}
+  .ticket__rows .r:last-child{border-bottom:0; padding-bottom:0}
+  .ticket__rows .k{font-family:"Spline Sans Mono",monospace; font-size:.58rem; letter-spacing:.1em; text-transform:uppercase; color:var(--faint)}
+  .ticket__rows .v{color:var(--fg)} .ticket__rows .v.p{color:var(--pop)}
+  .brc{position:absolute; z-index:6; right:clamp(18px,4vw,48px); bottom:clamp(30px,6vh,60px); text-align:right; font-family:"Spline Sans Mono",monospace}
+  .brc .l{font-size:.6rem; letter-spacing:.16em; text-transform:uppercase; color:var(--faint)}
+  .brc a{display:inline-block; margin-top:8px; font-size:.74rem; letter-spacing:.06em; text-transform:uppercase; color:var(--fg); border-bottom:1px solid var(--pop); padding-bottom:3px}
+  @media(max-width:720px){ .brc{display:none} }
+  .scrollcue{position:absolute; z-index:6; left:50%; bottom:14px; transform:translateX(-50%); font-family:"Spline Sans Mono",monospace; font-size:.6rem; letter-spacing:.2em; text-transform:uppercase; color:var(--faint)}
+
+  /* ---------------- SECTIONS ---------------- */
+  section.blk{position:relative; z-index:1; background:var(--bg); padding:clamp(72px,11vw,150px) 0; border-top:1px solid var(--line-2)}
+  section.blk.alt{background:var(--sunk)}
+  .eyebrow{display:flex; align-items:baseline; gap:14px; margin-bottom:22px}
+  .eyebrow .n{font-family:"Spline Sans Mono",monospace; font-size:.78rem; color:var(--pop)}
+  .eyebrow .l{font-family:"Spline Sans Mono",monospace; font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; color:var(--faint)}
+  .h2{font-size:clamp(2rem,4.6vw,3.5rem); max-width:20ch}
+  .h2 em{font-style:italic; color:var(--pop); font-family:"Bricolage Grotesque",serif}
+  .lead{margin-top:20px; max-width:58ch; color:var(--dim); font-size:1.07rem}
+
+  /* reveal */
+  .rl{opacity:0; transform:translateY(26px); transition:opacity .8s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); transition-delay:calc(var(--i,0)*.07s)}
+  .rl.in{opacity:1; transform:none}
+  @media (prefers-reduced-motion:reduce){ .rl{opacity:1; transform:none; transition:none} }
+  .reveal-all .rl{opacity:1!important; transform:none!important}
+
+  /* nesting motif */
+  .nest{margin-top:44px; aspect-ratio:16/6; border:1px solid var(--line); border-radius:16px; background:var(--sunk); padding:14px; position:relative;
+    display:grid; grid-template-columns:repeat(20,1fr); grid-template-rows:repeat(6,1fr); gap:5px}
+  @media(max-width:720px){.nest{aspect-ratio:16/9; grid-template-columns:repeat(12,1fr)}}
+  .pc{border-radius:3px; background:color-mix(in oklab,var(--ice) 20%, var(--ink-2)); border:1px solid color-mix(in oklab,var(--ice) 32%,transparent)}
+  .pc.p{background:color-mix(in oklab,var(--pop) 22%, var(--ink-2)); border-color:color-mix(in oklab,var(--pop) 40%,transparent)}
+  .nest.in .pc{animation:pop .6s cubic-bezier(.2,1.2,.3,1) backwards}
+  @keyframes pop{from{opacity:0; transform:scale(.4)}to{opacity:1; transform:none}}
+  .nest__badge{position:absolute; right:14px; bottom:14px; font-family:"Spline Sans Mono",monospace; font-size:.72rem; background:var(--bg); border:1px solid var(--line); padding:6px 11px; border-radius:8px}
+  .nest__badge b{color:var(--pop)}
+
+  /* before / after shift */
+  .shift{display:grid; grid-template-columns:1fr auto 1fr; gap:0; margin-top:40px; border:1px solid var(--line); border-radius:18px; overflow:hidden}
+  @media(max-width:720px){.shift{grid-template-columns:1fr}}
+  .shift__col{padding:34px clamp(22px,3vw,40px); background:var(--ink-2)}
+  .shift__col.after{background:linear-gradient(180deg,color-mix(in oklab,var(--pop) 9%,var(--ink-2)),var(--ink-2))}
+  .shift__lab{font-family:"Spline Sans Mono",monospace; font-size:.64rem; letter-spacing:.14em; text-transform:uppercase; color:var(--faint)}
+  .shift__col.after .shift__lab{color:var(--pop)}
+  .shift__t{font-family:"Bricolage Grotesque",sans-serif; font-weight:600; font-size:1.4rem; margin-top:12px; letter-spacing:-.02em}
+  .shift__d{margin-top:12px; color:var(--dim); font-size:.96rem}
+  .shift__seam{width:1px; background:repeating-linear-gradient(180deg,var(--pop) 0 7px, transparent 7px 14px)}
+  @media(max-width:720px){.shift__seam{width:auto; height:1px; background:repeating-linear-gradient(90deg,var(--pop) 0 7px,transparent 7px 14px)}}
+
+  /* split (engines) */
+  .split{display:grid; grid-template-columns:1fr 1fr; gap:clamp(28px,5vw,64px); align-items:center; margin-top:20px}
+  @media(max-width:840px){.split{grid-template-columns:1fr}}
+  .split.rev .split__media{order:-1}
+  @media(max-width:840px){.split.rev .split__media{order:0}}
+  .split__body .tag{font-family:"Spline Sans Mono",monospace; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--pop)}
+  .split__body h3{font-size:clamp(1.7rem,3.2vw,2.5rem); margin-top:14px}
+  .split__body p{margin-top:16px; color:var(--dim); max-width:48ch}
+  .flist{margin:22px 0 0; padding:0; list-style:none; display:grid; gap:11px}
+  .flist li{position:relative; padding-left:26px; color:var(--dim)}
+  .flist li::before{content:""; position:absolute; left:2px; top:.62em; width:10px; height:2px; background:var(--pop); border-radius:2px}
+  .flist li b{color:var(--fg); font-weight:600}
+  .stats{display:flex; gap:28px; flex-wrap:wrap; margin-top:26px}
+  .stats .s .n{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:1.5rem; letter-spacing:-.02em}
+  .stats .s .l{font-size:.8rem; color:var(--faint); margin-top:2px}
+  .glink{display:inline-flex; align-items:center; gap:8px; margin-top:26px; font-family:"Spline Sans Mono",monospace; font-size:.76rem; letter-spacing:.06em; text-transform:uppercase; color:var(--fg); border-bottom:1px solid var(--pop); padding-bottom:4px}
+
+  /* mock panels for engine media */
+  .mock{border:1px solid var(--line); border-radius:16px; background:var(--sunk); overflow:hidden; box-shadow:0 40px 80px -44px #000}
+  .mock__top{display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px dashed var(--line)}
+  .mock__top .t{font-family:"Spline Sans Mono",monospace; font-size:.62rem; letter-spacing:.13em; text-transform:uppercase; color:var(--faint)}
+  .mock__top .g{font-family:"Spline Sans Mono",monospace; font-size:.62rem; color:var(--ice); display:flex; gap:6px; align-items:center}
+  .mock__top .g::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--ice); box-shadow:0 0 8px var(--ice)}
+  .mock__prompt{padding:20px; font-family:"Spline Sans Mono",monospace; font-size:.92rem; color:var(--fg)}
+  .mock__prompt .cue{color:var(--pop)}
+  .mock__prompt .typed{border-right:2px solid var(--pop); padding-right:2px}
+  .mock__nest{padding:16px; display:grid; grid-template-columns:repeat(16,1fr); grid-template-rows:repeat(5,1fr); gap:5px; height:clamp(220px,28vw,280px)}
+  .gauge{padding:22px; display:flex; align-items:center; gap:22px}
+  .gauge__ring{width:120px; height:120px; flex:0 0 auto; border-radius:50%; display:grid; place-items:center;
+    background:conic-gradient(var(--pop) calc(var(--v,88)*1%), var(--line) 0)}
+  .gauge__ring i{width:96px; height:96px; border-radius:50%; background:var(--sunk); display:grid; place-items:center; font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:1.6rem; color:var(--pop)}
+  .gauge__meta .k{font-family:"Spline Sans Mono",monospace; font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:var(--faint)}
+  .gauge__meta .v{font-size:.95rem; color:var(--fg); margin:3px 0 12px}
+
+  /* browser-native reasons */
+  .reasons{margin-top:34px; display:grid; gap:0; border:1px solid var(--line); border-radius:16px; overflow:hidden}
+  .reason{display:grid; grid-template-columns:44px 1fr auto 1fr; gap:16px; align-items:center; padding:18px 20px; border-bottom:1px solid var(--line); background:var(--ink-2)}
+  .reason:last-child{border-bottom:0}
+  @media(max-width:720px){.reason{grid-template-columns:32px 1fr; row-gap:6px} .reason .arw{display:none}}
+  .reason .n{font-family:"Spline Sans Mono",monospace; font-size:.72rem; color:var(--pop)}
+  .reason .was{color:var(--faint); text-decoration:line-through; text-decoration-color:rgba(233,242,250,.25)}
+  .reason .arw{color:var(--pop)}
+  .reason .now{color:var(--fg); font-weight:500}
+
+  /* metrics + calculator */
+  .metrics{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:16px; overflow:hidden; margin-top:40px}
+  @media(max-width:720px){.metrics{grid-template-columns:repeat(2,1fr)}}
+  .metric{background:var(--ink-2); padding:26px 22px}
+  .metric .n{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(1.9rem,3.4vw,2.7rem); letter-spacing:-.03em}
+  .metric .n small{color:var(--pop); font-size:.7em}
+  .metric .l{margin-top:8px; font-size:.82rem; color:var(--faint)}
+  .calc{margin-top:24px; display:grid; grid-template-columns:1.1fr .9fr; gap:24px; align-items:stretch}
+  @media(max-width:840px){.calc{grid-template-columns:1fr}}
+  .calc__card{background:var(--ink-2); border:1px solid var(--line); border-radius:16px; padding:26px}
+  .calc__card .lab{font-family:"Spline Sans Mono",monospace; font-size:.66rem; letter-spacing:.12em; text-transform:uppercase; color:var(--faint)}
+  .calc__ig{margin-top:14px; display:flex; align-items:center; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--sunk)}
+  .calc__ig span{padding:0 14px; color:var(--dim); font-family:"Spline Sans Mono",monospace}
+  .calc__ig input{flex:1; min-width:0; background:transparent; border:0; color:var(--fg); font-size:1.4rem; font-family:"Bricolage Grotesque",sans-serif; font-weight:700; padding:14px 8px; outline:none}
+  .calc__ig .suf{font-size:.72rem; color:var(--faint); font-family:"Spline Sans Mono",monospace}
+  .calc__res{margin-top:20px; padding-top:20px; border-top:1px dashed var(--line)}
+  .calc__res .n{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(2.2rem,5vw,3.2rem); color:var(--pop); letter-spacing:-.03em}
+  .calc__res .l{font-size:.85rem; color:var(--dim); margin-top:4px}
+  .calc__note{margin-top:14px; font-size:.78rem; color:var(--faint); max-width:40ch}
+
+  /* proof track */
+  .track{position:relative; height:340vh; background:var(--sunk)}
+  .track__sticky{position:sticky; top:0; height:100svh; display:flex; flex-direction:column; justify-content:center; overflow:hidden}
+  .track__head{padding:0 6vw 28px}
+  .track__row{display:flex; gap:20px; padding:0 6vw; will-change:transform}
+  .track__card{flex:0 0 min(390px,80vw); background:var(--ink-2); border:1px solid var(--line); border-radius:16px; padding:26px; min-height:clamp(300px,42vh,360px); display:flex; flex-direction:column; justify-content:space-between; transition:border-color .3s, transform .3s}
+  .track__card:hover{border-color:var(--pop); transform:translateY(-4px)}
+  .track__card .lab{font-family:"Spline Sans Mono",monospace; font-size:.62rem; letter-spacing:.12em; text-transform:uppercase; color:var(--faint)}
+  .track__card .co{font-family:"Bricolage Grotesque",sans-serif; font-weight:600; font-size:1.55rem; margin-top:9px; letter-spacing:-.02em}
+  .track__card .jump{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(2.8rem,5vw,3.5rem); line-height:1; color:var(--pop); letter-spacing:-.03em}
+  .track__card .jump small{font-size:.36em; color:var(--dim)}
+  .track__card .jump s{font-family:"Spline Sans Mono",monospace; font-size:.8rem; color:var(--faint); text-decoration:none; display:block; margin-top:8px; letter-spacing:.03em}
+  .track__card .foot{font-size:.85rem; color:var(--dim); margin-top:14px}
+  .track__prog{height:2px; background:var(--line); margin:26px 6vw 0; position:relative}
+  .track__prog i{position:absolute; left:0; top:0; height:100%; width:0; background:var(--pop)}
+  @media(prefers-reduced-motion:reduce){ .track{height:auto} .track__sticky{position:static; height:auto; overflow-x:auto; padding:60px 0} .track__row{transform:none!important} }
+
+  /* marquee */
+  .marq{overflow:hidden; white-space:nowrap; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:20px 0; position:relative; z-index:1; background:var(--bg)}
+  .marq__track{display:inline-flex; gap:36px; will-change:transform}
+  .marq span{font-family:"Bricolage Grotesque",sans-serif; font-weight:600; font-size:clamp(1.2rem,2.6vw,1.9rem); color:var(--dim); display:inline-flex; gap:36px; align-items:center}
+  .marq b{color:var(--pop)} .marq i{color:var(--ice); font-style:normal}
+  .marq .dot{width:6px; height:6px; border-radius:50%; background:var(--faint)}
+
+  /* cta */
+  .cta{position:relative; z-index:1; text-align:center; padding:clamp(90px,15vw,180px) 0; background:var(--bg); overflow:hidden}
+  .cta::before{content:""; position:absolute; left:50%; top:40%; transform:translate(-50%,-50%); width:min(720px,90vw); height:520px; background:radial-gradient(circle, rgba(255,93,46,.16) 0%, transparent 62%); z-index:0}
+  .cta .wrap{position:relative; z-index:1}
+  .cta h2{font-size:clamp(2.4rem,6vw,4.6rem)} .cta h2 em{font-style:italic; color:var(--pop); font-family:"Bricolage Grotesque",serif}
+  .cta p{margin-top:18px; color:var(--dim); max-width:44ch; margin-left:auto; margin-right:auto}
+  .cta .pill{display:inline-block; margin-top:34px; font-size:.82rem; padding:16px 28px}
+
+  /* footer */
+  .footer{position:relative; z-index:1; background:var(--sunk); border-top:1px solid var(--line); padding:60px 0 34px}
+  .footer__top{display:grid; grid-template-columns:1.6fr 1fr 1fr; gap:32px}
+  @media(max-width:720px){.footer__top{grid-template-columns:1fr 1fr}}
+  .footer__brand .b{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:1.5rem; letter-spacing:-.02em} .footer__brand .b span{color:var(--pop)}
+  .footer__brand p{margin-top:12px; color:var(--dim); font-size:.9rem; max-width:34ch}
+  .footer__col h4{font-family:"Spline Sans Mono",monospace; font-size:.66rem; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); margin:0 0 14px}
+  .footer__col a,.footer__col p{display:block; color:var(--dim); font-size:.9rem; margin-bottom:9px}
+  .footer__col a:hover{color:var(--pop)}
+  .footer__bot{margin-top:44px; padding-top:22px; border-top:1px solid var(--line); display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; font-family:"Spline Sans Mono",monospace; font-size:.72rem; color:var(--faint)}
+  :focus-visible{outline:2px solid var(--ice); outline-offset:3px; border-radius:3px}
+</style>
+
+<canvas id="cont" aria-hidden="true"></canvas>
+
+<header class="bar" id="bar">
+  <a class="navbrand" href="#top">Optim<span>a</span>zi</a>
+  <div class="bar__r">
+    <a class="pill" href="#demo">Book a demo</a>
+    <button class="menu" aria-label="Menu"><i></i><i></i></button>
+  </div>
+</header>
+
+<main id="top">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="core">
+      <div class="aura" aria-hidden="true"></div>
+      <video autoplay muted loop playsinline preload="auto"><source src="videos/make_the_AI_rotate_blink_and.mp4" type="video/mp4"></video>
+    </div>
+    <div class="mark"><h1>OPTI<span>MAZI</span></h1></div>
+    <div class="tagline">
+      <div class="tagline__top">Human intuition-driven <span class="sep">|</span> AI-powered</div>
+      <div class="tagline__main">Fabric Cost Optimizer</div>
+    </div>
+    <aside class="ticket">
+      <svg class="ticket__shape" viewBox="0 0 300 340" preserveAspectRatio="none" aria-hidden="true"><path d="M26,34 L178,34 Q196,34 196,18 Q196,8 214,8 L274,8 Q292,8 292,26 L292,290 Q292,306 274,306 L138,306 Q120,306 120,318 Q120,330 102,330 L26,330 Q8,330 8,312 L8,52 Q8,34 26,34 Z" fill="#0E1826" stroke="rgba(233,242,250,.11)" stroke-width="1.2"></path></svg>
+      <div class="ticket__hd"><span class="t">Next cut</span><span class="live">Ultranest live</span></div>
+      <div class="ticket__b">
+        <div class="ticket__mk">Fabric utilization</div>
+        <div class="ticket__eff tnum" id="eff">88.6%</div>
+        <div class="ticket__rows">
+          <div class="r"><span class="k">Fabric</span><span class="v mono">Cotton twill · 150 cm</span></div>
+          <div class="r"><span class="k">Consumption</span><span class="v mono tnum">1.42 m / gmt</span></div>
+          <div class="r"><span class="k">Saved vs 78%</span><span class="v p mono" id="sav">+13.6%</span></div>
+        </div>
+      </div>
+    </aside>
+    <div class="brc"><div class="l">Marker to cut plan · minutes</div><a href="#solutions">See how it works →</a></div>
+    <div class="scrollcue">Scroll</div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marq" aria-hidden="true"><div class="marq__track" data-dir="1"><span>Marker making<i class="dot"></i><b>Nesting</b><i class="dot"></i>Cut planning<i class="dot"></i><i>Roll matching</i><i class="dot"></i>PLM &amp; BOM<i class="dot"></i>Marker making<i class="dot"></i><b>Nesting</b><i class="dot"></i>Cut planning<i class="dot"></i><i>Roll matching</i><i class="dot"></i>PLM &amp; BOM<i class="dot"></i></span></div></div>
+
+  <!-- BOTTLENECK -->
+  <section class="blk" id="solutions"><div class="wrap">
+    <div class="eyebrow rl"><span class="n">01</span><span class="l">The bottleneck</span></div>
+    <h2 class="h2 rl">The step that decides your margin — usually done <em>by hand, under pressure.</em></h2>
+    <p class="lead rl">Marker making and nesting is where fabric is won or lost. Optimazi turns one rushed guess into the best layout, every time — and shows you the number before you commit.</p>
+    <div class="nest rl" role="img" aria-label="Pattern pieces nested at 88.4% efficiency">
+      <span class="pc p" style="grid-area:1/1/4/4"></span><span class="pc" style="grid-area:1/4/3/8"></span><span class="pc" style="grid-area:1/8/4/12"></span><span class="pc p" style="grid-area:1/12/3/16"></span><span class="pc" style="grid-area:1/16/4/21"></span>
+      <span class="pc" style="grid-area:4/1/7/5"></span><span class="pc p" style="grid-area:3/5/6/8"></span><span class="pc" style="grid-area:4/8/7/12"></span><span class="pc" style="grid-area:3/12/6/16"></span><span class="pc p" style="grid-area:4/16/7/21"></span>
+      <span class="pc" style="grid-area:6/5/7/8"></span><span class="pc" style="grid-area:6/12/7/16"></span>
+      <span class="nest__badge mono">FABRIC UTILISATION <b>88.4%</b></span>
+    </div>
+  </div></section>
+
+  <!-- THE SHIFT -->
+  <section class="blk alt"><div class="wrap">
+    <div class="eyebrow rl"><span class="n">02</span><span class="l">The shift</span></div>
+    <h2 class="h2 rl">One rushed guess, or the <em>best layout every time.</em></h2>
+    <div class="shift">
+      <div class="shift__col rl"><div class="shift__lab">The old way</div><div class="shift__t">Built by hand, against the clock.</div><div class="shift__d">A marker is drawn piece by piece under a deadline. There's rarely time to try a second layout, so the first one ships — even when it wastes fabric. Consumption is estimated, then disputed later.</div></div>
+      <div class="shift__seam" aria-hidden="true"></div>
+      <div class="shift__col after rl" style="--i:1"><div class="shift__lab">With Optimazi</div><div class="shift__t">Nested to the best efficiency in the industry.</div><div class="shift__d">Marka builds the marker in minutes; Ultranest nests it and shows the number before you commit. Compare real options instead of a single guess — on every style, without adding an hour to the schedule.</div></div>
+    </div>
+  </div></section>
+
+  <!-- MARKA -->
+  <section class="blk"><div class="wrap split">
+    <div class="split__body rl">
+      <span class="tag">Solution 01 · Marka</span>
+      <h3>Build a marker from a sentence.</h3>
+      <p>Describe the marker you need in plain language and Marka builds it — the walk from pattern to marker drops from hours to minutes. The manual workflow is reimagined too, for teams who work by hand.</p>
+      <ul class="flist">
+        <li>Build from a sentence, or refine by hand — <b>both stay fast</b>.</li>
+        <li>Every marker feeds straight into <b>Ultranest</b>, nothing to re-enter.</li>
+        <li>Version history keeps <b>every option you tried</b>, not just the last.</li>
+      </ul>
+      <div class="stats"><div class="s"><div class="n">Hours → Minutes</div><div class="l">Time to build a marker</div></div><div class="s"><div class="n">One sentence</div><div class="l">Is enough to start</div></div></div>
+      <a class="glink" href="#demo">Explore Marka →</a>
+    </div>
+    <div class="split__media rl" style="--i:1">
+      <div class="mock">
+        <div class="mock__top"><span class="t">Marka · new marker</span><span class="g">building</span></div>
+        <div class="mock__prompt"><span class="cue">›</span> <span class="typed">nest a men's oxford shirt, size set S–XL, 150cm twill</span></div>
+        <div class="mock__nest">
+          <span class="pc p" style="grid-area:1/1/3/4"></span><span class="pc" style="grid-area:1/4/2/8"></span><span class="pc" style="grid-area:1/8/3/12"></span><span class="pc" style="grid-area:1/12/3/17"></span>
+          <span class="pc" style="grid-area:3/1/6/5"></span><span class="pc p" style="grid-area:2/5/4/8"></span><span class="pc" style="grid-area:3/8/6/12"></span><span class="pc" style="grid-area:3/12/5/15"></span>
+          <span class="pc" style="grid-area:4/5/6/8"></span><span class="pc p" style="grid-area:3/15/6/17"></span><span class="pc" style="grid-area:5/12/6/17"></span>
+        </div>
+      </div>
+    </div>
+  </div></section>
+
+  <!-- ULTRANEST -->
+  <section class="blk alt"><div class="wrap split rev">
+    <div class="split__body rl">
+      <span class="tag">Solution 02 · Ultranest</span>
+      <h3>Nest to the best efficiency in the industry.</h3>
+      <p>Most cutting rooms run 70–80% marker efficiency. Ultranest's AI nesting is built to reach 85–90% — closing a gap most teams assume is fixed, and turning it into fabric that's never wasted.</p>
+      <ul class="flist">
+        <li>Compare marker options <b>side by side</b> before you commit.</li>
+        <li>Suggestions to <b>adjust a pattern</b> and lift efficiency.</li>
+        <li>Consumption writes straight to the <b>PLM's BOM</b> — zero re-entry.</li>
+        <li>Recommends <b>which roll suits which marker</b> for best width use.</li>
+      </ul>
+      <a class="glink" href="#demo">Explore Ultranest →</a>
+    </div>
+    <div class="split__media rl" style="--i:1">
+      <div class="mock">
+        <div class="mock__top"><span class="t">Ultranest · marker 04</span><span class="g">nesting</span></div>
+        <div class="gauge">
+          <div class="gauge__ring" style="--v:88"><i class="tnum" id="gv">88.4%</i></div>
+          <div class="gauge__meta">
+            <div class="k">Marker width</div><div class="v mono">150 cm</div>
+            <div class="k">Consumption</div><div class="v mono">1.42 m / gmt</div>
+            <div class="k">Roll matched</div><div class="v mono">Lot 22 · 149.6 cm</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div></section>
+
+  <!-- BROWSER-NATIVE -->
+  <section class="blk"><div class="wrap">
+    <div class="eyebrow rl"><span class="n">03</span><span class="l">Why browser-native</span></div>
+    <h2 class="h2 rl">Built for the browser. <em>Not bolted onto one.</em></h2>
+    <p class="lead rl">Most marker-making software still ships as a desktop install, tied to one machine and one version. Optimazi was built the other way round.</p>
+    <div class="reasons rl">
+      <div class="reason"><span class="n">01</span><span class="was">Installed per seat, licensed per machine</span><span class="arw">→</span><span class="now">Opens in any browser, on any device, in seconds</span></div>
+      <div class="reason"><span class="n">02</span><span class="was">A different file format at every handoff</span><span class="arw">→</span><span class="now">One dataset, from first pattern to final cut plan</span></div>
+      <div class="reason"><span class="n">03</span><span class="was">Version drift between studio and floor</span><span class="arw">→</span><span class="now">Everyone on the same version, automatically</span></div>
+      <div class="reason"><span class="n">04</span><span class="was">Repeatable steps done by hand, every time</span><span class="arw">→</span><span class="now">An AI assistant drafts the repeatable steps for you</span></div>
+      <div class="reason"><span class="n">05</span><span class="was">Efficiency figures land in a report, days later</span><span class="arw">→</span><span class="now">Efficiency &amp; consumption surface the moment they're generated</span></div>
+    </div>
+  </div></section>
+
+  <!-- THE MATH -->
+  <section class="blk alt" id="roi"><div class="wrap">
+    <div class="eyebrow rl"><span class="n">04</span><span class="l">The math</span></div>
+    <h2 class="h2 rl">A few points of efficiency. A <em>very different bottom line.</em></h2>
+    <p class="lead rl">The gap between "typical" and "excellent" compounds fast at scale. Here's what closing it looks like in real numbers.</p>
+    <div class="metrics rl">
+      <div class="metric"><div class="n">85–90<small>%</small></div><div class="l">Efficiency Optimazi is built for</div></div>
+      <div class="metric"><div class="n">Minutes</div><div class="l">Marker built, not hours</div></div>
+      <div class="metric"><div class="n">100<small>%</small></div><div class="l">Browser-native · nothing to install</div></div>
+      <div class="metric"><div class="n" data-count="50" data-prefix="$" data-suffix="M+">$0</div><div class="l">Illustrative saving · $1B house</div></div>
+    </div>
+    <div class="calc rl">
+      <div class="shift__col" style="background:var(--ink-2); border:1px solid var(--line); border-radius:16px; display:flex; flex-direction:column; justify-content:center">
+        <div class="shift__lab">Potential lift</div>
+        <div style="font-family:'Bricolage Grotesque',sans-serif; font-weight:700; font-size:clamp(2.6rem,6vw,4rem); color:var(--pop); letter-spacing:-.03em; margin-top:8px">+50%</div>
+        <div class="shift__d">to operating margin, for an illustrative house with $1B revenue, ~50% material cost, and a $100M operating profit. Efficiency range reflects published industry benchmarks, not any specific competitor.</div>
+      </div>
+      <div class="calc__card">
+        <div class="lab">See it with your numbers</div>
+        <div class="calc__ig"><span>$</span><input id="spend" type="number" min="0" step="1" placeholder="25" inputmode="decimal"><span class="suf">M / yr</span></div>
+        <div class="calc__res"><div class="n tnum" id="save">—</div><div class="l">Estimated annual fabric saving</div></div>
+        <p class="calc__note">Closing the efficiency gap typically saves 10–15% of fabric spend. Estimates only — actual results depend on your product mix and current utilisation.</p>
+      </div>
+    </div>
+  </div></section>
+
+  <!-- PROOF TRACK -->
+  <section class="track" id="proof">
+    <div class="track__sticky">
+      <div class="track__head">
+        <div class="eyebrow"><span class="n">05</span><span class="l">Proof on the floor — scroll →</span></div>
+        <h2 class="h2">Real lines. Real <em>points recovered.</em></h2>
+      </div>
+      <div class="track__row">
+        <article class="track__card"><div><div class="lab">Program 01 · cotton poplin</div><div class="co">Oxford shirt run</div></div><div><div class="jump tnum">89.1<small>%</small><s>from 78.2% by hand</s></div><div class="foot">+10.9 points on a 24k-unit cut — ~1,900 m of fabric recovered.</div></div></article>
+        <article class="track__card"><div><div class="lab">Program 02 · 12 oz stretch denim</div><div class="co">Five-pocket jean</div></div><div><div class="jump tnum">86.3<small>%</small><s>from 74.6% by hand</s></div><div class="foot">+11.7 points — denim's the most expensive metre to waste.</div></div></article>
+        <article class="track__card"><div><div class="lab">Program 03 · single jersey</div><div class="co">Ribbed knit tee</div></div><div><div class="jump tnum">90.4<small>%</small><s>from 81.0% by hand</s></div><div class="foot">+9.4 points, and roll-matched so every width is used.</div></div></article>
+        <article class="track__card"><div><div class="lab">Program 04 · bonded softshell</div><div class="co">Tailored outerwear</div></div><div><div class="jump tnum">84.9<small>%</small><s>from 71.8% by hand</s></div><div class="foot">+13.1 points on the hardest shapes to nest by hand.</div></div></article>
+      </div>
+      <div class="track__prog" aria-hidden="true"><i></i></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" id="demo"><div class="wrap">
+    <h2 class="rl">Ready to see it on <em>your</em> styles?</h2>
+    <p class="rl" style="--i:1">Book a demo and we'll run Optimazi on your own markers — and show you the fabric you're leaving on the table.</p>
+    <a class="pill rl" style="--i:2" href="mailto:info@gelianfashion.com">Book a demo</a>
+  </div></section>
+
+  <!-- FOOTER -->
+  <footer class="footer"><div class="wrap">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <div class="b">Optim<span>a</span>zi</div>
+        <p>Human intuition-driven, AI-powered fabric-cost optimizer. Marker making · nesting · cut planning.</p>
+      </div>
+      <div class="footer__col"><h4>Product</h4><a href="#solutions">The bottleneck</a><a href="#roi">The math</a><a href="#proof">Proof</a><a href="#demo">Book a demo</a></div>
+      <div class="footer__col"><h4>Gelian (Pvt) Ltd</h4><p>No. 37, Sri Sumangala Road,<br>Rathmalana, Sri Lanka</p><a href="tel:+94771776347">+94 77 177 6347</a><a href="mailto:info@gelianfashion.com">info@gelianfashion.com</a></div>
+    </div>
+    <div class="footer__bot"><span>© <span id="yr">2026</span> Gelian (Pvt) Ltd. All rights reserved.</span><span>Marker making · Nesting · Cut planning</span></div>
+  </div></footer>
+</main>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* nav bg on scroll */
+  var bar=document.getElementById("bar");
+  addEventListener("scroll", function(){ bar.classList.toggle("scrolled", window.pageYOffset>60); }, {passive:true});
+
+  /* year */
+  var yr=document.getElementById("yr"); if(yr) yr.textContent=new Date().getFullYear();
+
+  /* reveal + count triggers */
+  function count(el){ if(el.__d) return; el.__d=true; var to=parseFloat(el.getAttribute("data-count")), pre=el.getAttribute("data-prefix")||"", suf=el.getAttribute("data-suffix")||"", t0=null;
+    if(reduce){ el.textContent=pre+to+suf; return; }
+    (function step(ts){ if(!t0)t0=ts; var p=Math.min(1,(ts-t0)/1200); el.textContent=pre+Math.round(to*(1-Math.pow(1-p,3)))+suf; if(p<1) requestAnimationFrame(step); })(0);
+  }
+  var rls=document.querySelectorAll(".rl,.nest,[data-count]");
+  if("IntersectionObserver" in window && !reduce){
+    var io=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); if(e.target.hasAttribute("data-count")) count(e.target); io.unobserve(e.target); } }); }, {threshold:.16, rootMargin:"0px 0px -6% 0px"});
+    rls.forEach(function(el){ io.observe(el); });
+    addEventListener("load", function(){ setTimeout(function(){ document.documentElement.classList.add("reveal-all"); }, 5000); });
+  } else { rls.forEach(function(el){ el.classList.add("in"); if(el.hasAttribute("data-count")) count(el); }); }
+
+  /* hero live utilization + gauge */
+  var eff=document.getElementById("eff"), sav=document.getElementById("sav"), gv=document.getElementById("gv"), gring=document.querySelector(".gauge__ring"), ev=88.6;
+  if(!reduce){ setInterval(function(){ ev=Math.max(87.6,Math.min(90.3, ev+(Math.random()-.5)*.7));
+    if(eff) eff.textContent=ev.toFixed(1)+"%"; if(sav) sav.textContent="+"+((ev-78)/78*100).toFixed(1)+"%";
+    if(gv) gv.textContent=ev.toFixed(1)+"%"; if(gring) gring.style.setProperty("--v", ev.toFixed(0));
+  },900); }
+
+  /* ROI calculator */
+  var spend=document.getElementById("spend"), save=document.getElementById("save");
+  function calc(){ var v=parseFloat(spend.value); if(isNaN(v)||v<=0){ save.textContent="—"; return; } save.textContent="$"+ (v*0.125).toFixed(1) +"M"; }
+  if(spend){ spend.addEventListener("input", calc); }
+
+  /* marquee (scroll-velocity reactive) */
+  var marqs=[].slice.call(document.querySelectorAll(".marq__track")).map(function(t){ return {el:t, dir:parseFloat(t.getAttribute("data-dir"))||1, off:0, half:0}; });
+  function measure(){ marqs.forEach(function(m){ m.half=m.el.scrollWidth/2; }); } measure(); addEventListener("resize", measure);
+  var last=window.pageYOffset, vel=0;
+  addEventListener("scroll", function(){ var y=window.pageYOffset; vel=y-last; last=y; }, {passive:true});
+
+  /* proof track */
+  var track=document.getElementById("proof"), row=track?track.querySelector(".track__row"):null, prog=track?track.querySelector(".track__prog i"):null;
+
+  function tick(){
+    if(!reduce){
+      var boost=Math.min(6, Math.abs(vel)*.25);
+      marqs.forEach(function(m){ m.off += (0.5+boost)*m.dir; if(m.half){ if(m.off>m.half)m.off-=m.half; if(m.off<0)m.off+=m.half; } m.el.style.transform="translate3d("+(-m.off).toFixed(1)+"px,0,0)"; });
+      vel*=0.9;
+      if(track&&row){ var total=track.offsetHeight-innerHeight; if(total>0){ var p=Math.min(1,Math.max(0,(-track.getBoundingClientRect().top)/total)); var max=Math.max(0,row.scrollWidth-innerWidth); row.style.transform="translate3d("+(-p*max).toFixed(1)+"px,0,0)"; if(prog) prog.style.width=(p*100).toFixed(1)+"%"; } }
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  /* ambient topographic contour bg (fixed, subtle) */
+  var cv=document.getElementById("cont"), ctx=cv.getContext("2d"), W,H,DPR,mx=.5,my=.5;
+  function size(){ DPR=Math.min(2,window.devicePixelRatio||1); W=cv.clientWidth=innerWidth; H=cv.clientHeight=innerHeight; cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0); }
+  addEventListener("resize", size); size();
+  addEventListener("mousemove", function(e){ mx=e.clientX/W; my=e.clientY/H; }, {passive:true});
+  var LEV=[-2.7,-1.8,-.9,0,.9,1.8,2.7], MS={1:[3,2],2:[2,1],3:[3,1],4:[0,1],5:[0,3,2,1],6:[0,2],7:[0,3],8:[0,3],9:[0,2],10:[0,1,2,3],11:[0,1],12:[3,1],13:[1,2],14:[3,2]};
+  function fld(x,y,T){ return Math.sin(x*.006+T*1.5)+Math.sin(y*.0082-T*1.2)+Math.sin((x+y)*.005+T)+.6*Math.sin((x-y)*.0091-T*.8); }
+  function EP(e,pt,pr,pb,pl){ return e===0?pt:e===1?pr:e===2?pb:pl; }
+  function draw(ts){ ctx.clearRect(0,0,W,H);
+    var T=(ts||0)*.00028, ox=(mx-.5)*30, oy=(my-.5)*22, sy=window.pageYOffset*.12;
+    var CELL=Math.max(42,Math.min(62,Math.round(W/30))), gc=Math.ceil(W/CELL)+3, gr=Math.ceil(H/CELL)+3, g=new Float32Array(gc*gr),i,j,x,y;
+    for(j=0;j<gr;j++){ for(i=0;i<gc;i++){ g[j*gc+i]=fld(i*CELL-ox, j*CELL-oy+sy, T); } }
+    for(var li=0;li<LEV.length;li++){ var L=LEV[li]; ctx.strokeStyle=(li===3)?"rgba(255,93,46,.09)":"rgba(233,242,250,.05)"; ctx.lineWidth=1.1; ctx.beginPath();
+      for(y=0;y<gr-1;y++){ for(x=0;x<gc-1;x++){ var tl=g[y*gc+x],tr=g[y*gc+x+1],br=g[(y+1)*gc+x+1],bl=g[(y+1)*gc+x]; var ci=(tl>L?8:0)|(tr>L?4:0)|(br>L?2:0)|(bl>L?1:0); if(ci===0||ci===15) continue;
+        var X=x*CELL,Y=y*CELL, pt=[X+CELL*(L-tl)/(tr-tl),Y],pr=[X+CELL,Y+CELL*(L-tr)/(br-tr)],pb=[X+CELL*(L-bl)/(br-bl),Y+CELL],pl=[X,Y+CELL*(L-tl)/(bl-tl)];
+        var seg=MS[ci]; for(var s=0;s<seg.length;s+=2){ var a=EP(seg[s],pt,pr,pb,pl),z=EP(seg[s+1],pt,pr,pb,pl); ctx.moveTo(a[0],a[1]); ctx.lineTo(z[0],z[1]); } } }
+      ctx.stroke();
+    }
+  }
+  if(reduce){ draw(0); } else { var run=true; var loop=function(ts){ if(run){ draw(ts); requestAnimationFrame(loop); } }; requestAnimationFrame(loop);
+    document.addEventListener("visibilitychange", function(){ run=!document.hidden; if(run) requestAnimationFrame(loop); }); }
+
+  /* smooth scroll (Lenis, lazy) */
+  function bindA(useLenis, lenis){ document.querySelectorAll('a[href^="#"]').forEach(function(a){ a.addEventListener("click", function(e){ var id=a.getAttribute("href"); if(id.length<2) return; var el=document.querySelector(id); if(!el) return; if(useLenis){ e.preventDefault(); lenis.scrollTo(el,{offset:-70}); } }); }); }
+  if(!reduce){ var ls=document.createElement("script"); ls.src="https://cdnjs.cloudflare.com/ajax/libs/lenis/1.1.14/lenis.min.js"; ls.async=true;
+    ls.onload=function(){ try{ if(!window.Lenis){ bindA(false); return; } var lenis=new Lenis({duration:1.15, smoothWheel:true, easing:function(t){return Math.min(1,1.001-Math.pow(2,-10*t));}}); (function raf(t){ lenis.raf(t); requestAnimationFrame(raf); })(); bindA(true,lenis); }catch(e){ bindA(false); } };
+    ls.onerror=function(){ bindA(false); }; document.body.appendChild(ls);
+  }
+})();
+</script>
