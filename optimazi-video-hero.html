@@ -9,9 +9,11 @@
   *{box-sizing:border-box} a{color:inherit; text-decoration:none}
   html,body{margin:0; height:100%; background:#05111A; color:var(--fg); font-family:"Hanken Grotesk",system-ui,sans-serif; overflow:hidden}
   #stage{position:fixed; inset:0; overflow:hidden}
-  .corebox{position:absolute; left:50%; top:47%; transform:translate(-50%,-50%); z-index:1;
-    width:min(820px,92vw); height:min(78vh,680px); display:grid; place-items:center}
-  .corebox video{width:100%; height:100%; object-fit:contain; mix-blend-mode:screen; filter:saturate(1.05) contrast(1.05)}
+  .corebox{position:absolute; left:50%; top:43%; transform:translate(-50%,-50%); z-index:1;
+    width:min(760px,92vw); height:min(66vh,580px); display:grid; place-items:center}
+  .corebox video{width:100%; height:100%; object-fit:contain; mix-blend-mode:screen; filter:saturate(1.12) contrast(1.08) brightness(1.05);
+    -webkit-mask-image:radial-gradient(circle at 50% 50%, #000 28%, rgba(0,0,0,.5) 48%, transparent 63%);
+    mask-image:radial-gradient(circle at 50% 50%, #000 28%, rgba(0,0,0,.5) 48%, transparent 63%)}
   .vig{position:absolute; inset:0; z-index:2; pointer-events:none; box-shadow:inset 0 0 260px 70px rgba(3,7,12,.7)}
 
   .bar{position:absolute; top:0; left:0; right:0; z-index:6; display:flex; align-items:center; justify-content:space-between; padding:24px clamp(24px,5vw,60px)}
