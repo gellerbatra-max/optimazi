@@ -55,7 +55,7 @@
       var W = panel.clientWidth, H = panel.clientHeight; if(!W || !H) return;
       var rise = parseFloat(getComputedStyle(panel).getPropertyValue("--rise")) || 20;
       var st = 2, R = 13, cx = W/2, TH = H + 2*rise;
-      var tH = Math.max(120, Math.min(300, W*0.30))/2, bH = Math.max(200, Math.min(480, W*0.46))/2, s = Math.min(30, W*0.028);
+      var tH = Math.max(170, Math.min(440, W*0.40))/2, bH = Math.max(300, Math.min(880, W*0.72))/2, s = Math.min(30, W*0.028);
       var L = st, Rt = W - st, yTop = st, yT = rise, yB = rise + H, yBot = TH - st;
       var d = "M"+L+","+(yT+R)
         + "Q"+L+","+yT+" "+(L+R)+","+yT
@@ -77,12 +77,21 @@
       svg.setAttribute("viewBox","0 0 "+W+" "+TH);
       svg.setAttribute("width",W); svg.setAttribute("height",TH);
       path.setAttribute("d",d);
+      var sc = parseFloat((getComputedStyle(panel).transform.match(/matrix\(\s*([-\d.]+)/)||[0,0.94])[1]) || 0.94;
+      panel.style.marginBottom = Math.round(-(1-sc) * H) + "px"; /* reclaim the space the scale leaves below */
     }
     build();
     if("ResizeObserver" in window){ new ResizeObserver(build).observe(panel); }
     window.addEventListener("resize", build);
     window.addEventListener("load", build);
     setTimeout(build,300); setTimeout(build,1200);
+
+    /* hide the top nav once the footer card comes into view */
+    if("IntersectionObserver" in window){
+      new IntersectionObserver(function(es){
+        es.forEach(function(e){ nav.classList.toggle("bar--gone", e.isIntersecting); });
+      }, {threshold:0.06}).observe(panel);
+    }
   })();
 
   /* mark current page active in footer + highlight */
