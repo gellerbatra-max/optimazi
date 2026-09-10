@@ -12,13 +12,12 @@
   #cont{position:absolute; inset:0; z-index:0; display:block}
 
   /* AI core — video dissolved into the ground via a veil in the exact page colour */
-  .core{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:1; width:min(900px,98vw); height:min(80vh,740px); pointer-events:none}
+  .core{position:absolute; left:50%; top:49%; transform:translate(-50%,-50%); z-index:1; width:min(1040px,98vw); aspect-ratio:16/9; max-height:84vh; pointer-events:none}
   .core > *{position:absolute; inset:0}
-  .core .aura{background:radial-gradient(circle at 50% 50%, rgba(255,93,46,.13) 0%, rgba(143,190,221,.06) 32%, transparent 58%); z-index:0}
-  .core video{width:100%; height:100%; object-fit:contain; z-index:1; filter:saturate(1.14) contrast(1.06) brightness(1.05);
-    -webkit-mask-image:radial-gradient(circle at 50% 50%, #000 38%, rgba(0,0,0,.55) 56%, transparent 72%);
-    mask-image:radial-gradient(circle at 50% 50%, #000 38%, rgba(0,0,0,.55) 56%, transparent 72%)}
-  .core .veil{z-index:2; background:radial-gradient(circle at 50% 50%, rgba(9,18,30,0) 36%, rgba(9,18,30,.6) 55%, #09121E 72%)}
+  .core .aura{background:radial-gradient(circle at 50% 50%, rgba(255,93,46,.13) 0%, rgba(143,190,221,.06) 30%, transparent 56%); z-index:0}
+  .core video{width:100%; height:100%; object-fit:cover; z-index:1; filter:saturate(1.14) contrast(1.06) brightness(1.05);
+    -webkit-mask-image:radial-gradient(ellipse 58% 58% at 50% 50%, #000 34%, rgba(0,0,0,.5) 60%, transparent 82%);
+    mask-image:radial-gradient(ellipse 58% 58% at 50% 50%, #000 34%, rgba(0,0,0,.5) 60%, transparent 82%)}
 
   /* top bar */
   .bar{position:absolute; top:0; left:0; right:0; z-index:10; display:flex; align-items:center; justify-content:space-between; padding:22px clamp(20px,4vw,48px)}
@@ -31,7 +30,7 @@
   /* wordmark (from B, recolored for dark) */
   .mark{position:absolute; z-index:4; top:clamp(78px,12vh,120px); left:50%; transform:translateX(-50%); text-align:center; width:100%}
   .mark h1{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(3.4rem,13vw,9.5rem); line-height:.82; letter-spacing:-.05em; margin:0; color:var(--fg)}
-  .mark h1 span{color:transparent; -webkit-text-stroke:1.4px rgba(234,242,250,.42); text-stroke:1.4px rgba(234,242,250,.42)}
+  .mark h1 span{color:transparent; -webkit-text-stroke:1.6px var(--pop); text-stroke:1.6px var(--pop)}
 
   /* NEXT CUT ticket (from B, restyled for dark) */
   .ticket{position:absolute; z-index:6; left:clamp(18px,4vw,48px); bottom:clamp(24px,6vh,56px); width:min(290px,74vw); background:#0E1826; border:1px solid rgba(233,242,250,.10); color:var(--fg); border-radius:15px; overflow:hidden; box-shadow:0 30px 70px -30px rgba(0,0,0,.7)}
@@ -64,17 +63,15 @@
     <video autoplay muted loop playsinline preload="auto">
       <source src="videos/make_the_AI_rotate_blink_and.mp4" type="video/mp4">
     </video>
-    <div class="veil" aria-hidden="true"></div>
   </div>
 
   <header class="bar">
     <a class="pill" href="#">Book a demo</a>
-    <a class="omark" href="#" aria-label="Optimazi">O<span>.</span></a>
     <button class="menu" aria-label="Menu"><i></i><i></i></button>
   </header>
 
   <div class="mark">
-    <h1>OPTIM<span>AZI</span></h1>
+    <h1>OPTI<span>MAZI</span></h1>
   </div>
 
   <aside class="ticket">
