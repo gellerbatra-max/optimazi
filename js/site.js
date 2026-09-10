@@ -19,8 +19,8 @@
   var foot = document.createElement("footer");
   foot.className = "megafoot";
   foot.innerHTML =
-    '<div class="megafoot__panel">'
-  +   '<div class="megafoot__notch" aria-hidden="true"><span></span><span></span></div>'
+    '<div class="megafoot__shape" aria-hidden="true"><svg viewBox="0 0 1200 560" preserveAspectRatio="none"><path d="M44,34 L534,34 L560,8 Q566,4 574,4 L626,4 Q634,4 640,8 L666,34 L1156,34 Q1200,34 1200,78 L1200,482 Q1200,526 1156,526 L666,526 L640,552 Q634,556 626,556 L574,556 Q566,556 560,552 L534,526 L44,526 Q0,526 0,482 L0,78 Q0,34 44,34 Z" fill="#0B0F16" stroke="#FF5D2E" stroke-width="4" vector-effect="non-scaling-stroke"/></svg></div>'
+  +   '<div class="megafoot__panel">'
   +   '<div class="mf-w">'
   +     '<div class="megafoot__top"><div class="megafoot__word">OPTI<span>MAZI</span></div>'
   +       '<a class="megafoot__store" href="contact.html">Book a demo</a></div>'
