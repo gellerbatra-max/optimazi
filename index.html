@@ -76,9 +76,12 @@
   .scrollcue{position:absolute; z-index:6; left:50%; bottom:14px; transform:translateX(-50%); font-family:"Spline Sans Mono",monospace; font-size:.6rem; letter-spacing:.2em; text-transform:uppercase; color:var(--faint)}
 
   /* content page reveals over the fixed hero, on a bone ground (dark -> light on scroll) */
-  .content{position:relative; z-index:2; margin-top:100svh; border-radius:34px 34px 0 0; box-shadow:0 -30px 80px -14px rgba(0,0,0,.6); overflow:hidden;
+  .content{position:relative; z-index:2; margin-top:100svh; border-radius:34px 34px 0 0; box-shadow:0 -30px 80px -14px rgba(0,0,0,.6);
     --bg:#EBE7DB; --ink-2:#F4F0E5; --ink-3:#E8E3D4; --sunk:#E1DCCD; --fg:#191A10; --dim:#585849; --faint:#8A8A77; --line:rgba(25,26,16,.15); --line-2:rgba(25,26,16,.06);
     background:var(--bg); color:var(--fg)}
+  .contlight{position:sticky; top:0; height:100vh; width:100%; z-index:0; margin-bottom:-100vh; pointer-events:none; display:block}
+  .content section.blk, .content .marq{background:transparent}
+  .content .marq{position:relative; z-index:1}
   /* product "screens" + closing bands stay dark on the bone page */
   .content .nest, .content .mock, .content .track, .content .cta, .content .footer{
     --bg:#09121E; --ink-2:#0E1826; --ink-3:#141F30; --sunk:#070E18; --fg:#EAF2FA; --dim:#8FA3B8; --faint:#5E6C86; --line:rgba(233,242,250,.12); --line-2:rgba(233,242,250,.06)}
@@ -273,6 +276,7 @@
   </section>
 
   <div class="content">
+  <canvas class="contlight" aria-hidden="true"></canvas>
   <!-- MARQUEE -->
   <div class="marq" aria-hidden="true"><div class="marq__track" data-dir="1"><span>Marker making<i class="dot"></i><b>Nesting</b><i class="dot"></i>Cut planning<i class="dot"></i><i>Roll matching</i><i class="dot"></i>PLM &amp; BOM<i class="dot"></i>Marker making<i class="dot"></i><b>Nesting</b><i class="dot"></i>Cut planning<i class="dot"></i><i>Roll matching</i><i class="dot"></i>PLM &amp; BOM<i class="dot"></i></span></div></div>
 
@@ -491,26 +495,35 @@
   }
   requestAnimationFrame(tick);
 
-  /* ambient topographic contour bg (fixed, subtle) */
-  var cv=document.getElementById("cont"), ctx=cv.getContext("2d"), W,H,DPR,mx=.5,my=.5;
-  function size(){ DPR=Math.min(2,window.devicePixelRatio||1); W=cv.clientWidth=innerWidth; H=cv.clientHeight=innerHeight; cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0); }
-  addEventListener("resize", size); size();
-  addEventListener("mousemove", function(e){ mx=e.clientX/W; my=e.clientY/H; }, {passive:true});
+  /* ambient topographic contours: dark hero canvas + light drifting lines on the bone page */
   var LEV=[-2.7,-1.8,-.9,0,.9,1.8,2.7], MS={1:[3,2],2:[2,1],3:[3,1],4:[0,1],5:[0,3,2,1],6:[0,2],7:[0,3],8:[0,3],9:[0,2],10:[0,1,2,3],11:[0,1],12:[3,1],13:[1,2],14:[3,2]};
   function fld(x,y,T){ return Math.sin(x*.006+T*1.5)+Math.sin(y*.0082-T*1.2)+Math.sin((x+y)*.005+T)+.6*Math.sin((x-y)*.0091-T*.8); }
   function EP(e,pt,pr,pb,pl){ return e===0?pt:e===1?pr:e===2?pb:pl; }
-  function draw(ts){ ctx.clearRect(0,0,W,H);
-    var T=(ts||0)*.00028, ox=(mx-.5)*30, oy=(my-.5)*22, sy=window.pageYOffset*.12;
-    var CELL=Math.max(42,Math.min(62,Math.round(W/30))), gc=Math.ceil(W/CELL)+3, gr=Math.ceil(H/CELL)+3, g=new Float32Array(gc*gr),i,j,x,y;
+  function contours(cx,Wd,Ht,T,sy,ox,oy,dark){ cx.clearRect(0,0,Wd,Ht);
+    var CELL=Math.max(44,Math.min(64,Math.round(Wd/29))), gc=Math.ceil(Wd/CELL)+3, gr=Math.ceil(Ht/CELL)+3, g=new Float32Array(gc*gr),i,j,x,y;
     for(j=0;j<gr;j++){ for(i=0;i<gc;i++){ g[j*gc+i]=fld(i*CELL-ox, j*CELL-oy+sy, T); } }
-    for(var li=0;li<LEV.length;li++){ var L=LEV[li]; ctx.strokeStyle=(li===3)?"rgba(255,93,46,.09)":"rgba(233,242,250,.05)"; ctx.lineWidth=1.1; ctx.beginPath();
+    for(var li=0;li<LEV.length;li++){ var L=LEV[li];
+      cx.strokeStyle = dark ? ((li===3)?"rgba(255,93,46,.09)":"rgba(233,242,250,.05)") : ((li===3)?"rgba(255,93,46,.14)":"rgba(25,26,16,.12)");
+      cx.lineWidth=1.1; cx.beginPath();
       for(y=0;y<gr-1;y++){ for(x=0;x<gc-1;x++){ var tl=g[y*gc+x],tr=g[y*gc+x+1],br=g[(y+1)*gc+x+1],bl=g[(y+1)*gc+x]; var ci=(tl>L?8:0)|(tr>L?4:0)|(br>L?2:0)|(bl>L?1:0); if(ci===0||ci===15) continue;
         var X=x*CELL,Y=y*CELL, pt=[X+CELL*(L-tl)/(tr-tl),Y],pr=[X+CELL,Y+CELL*(L-tr)/(br-tr)],pb=[X+CELL*(L-bl)/(br-bl),Y+CELL],pl=[X,Y+CELL*(L-tl)/(bl-tl)];
-        var seg=MS[ci]; for(var s=0;s<seg.length;s+=2){ var a=EP(seg[s],pt,pr,pb,pl),z=EP(seg[s+1],pt,pr,pb,pl); ctx.moveTo(a[0],a[1]); ctx.lineTo(z[0],z[1]); } } }
-      ctx.stroke();
+        var seg=MS[ci]; for(var s=0;s<seg.length;s+=2){ var a=EP(seg[s],pt,pr,pb,pl),z=EP(seg[s+1],pt,pr,pb,pl); cx.moveTo(a[0],a[1]); cx.lineTo(z[0],z[1]); } } }
+      cx.stroke();
     }
   }
-  if(reduce){ draw(0); } else { var run=true; var loop=function(ts){ if(run){ draw(ts); requestAnimationFrame(loop); } }; requestAnimationFrame(loop);
+  var cv=document.getElementById("cont"), ctx=cv?cv.getContext("2d"):null, W,H,mx=.5,my=.5;
+  var cl=document.querySelector(".contlight"), clx=cl?cl.getContext("2d"):null, CW,CH;
+  function size(){ var DPR=Math.min(2,window.devicePixelRatio||1);
+    if(ctx){ W=innerWidth; H=innerHeight; cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0); }
+    if(clx){ CW=cl.clientWidth||innerWidth; CH=cl.clientHeight||innerHeight; cl.width=CW*DPR; cl.height=CH*DPR; clx.setTransform(DPR,0,0,DPR,0,0); }
+  }
+  addEventListener("resize", size); addEventListener("load", size); size();
+  addEventListener("mousemove", function(e){ mx=e.clientX/innerWidth; my=e.clientY/innerHeight; }, {passive:true});
+  function frame(ts){ var T=(ts||0)*.00028;
+    if(ctx) contours(ctx,W,H,T, window.pageYOffset*.12, (mx-.5)*30,(my-.5)*22, true);
+    if(clx) contours(clx,CW,CH,T, window.pageYOffset*.14, 0, 0, false);
+  }
+  if(reduce){ frame(0); } else { var run=true; var loop=function(ts){ if(run){ frame(ts); requestAnimationFrame(loop); } }; requestAnimationFrame(loop);
     document.addEventListener("visibilitychange", function(){ run=!document.hidden; if(run) requestAnimationFrame(loop); }); }
 
   /* smooth scroll (Lenis, lazy) */
