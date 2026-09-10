@@ -1,0 +1,131 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Optimazi Hero — Bone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{ --bone:#E9E5D7; --bone2:#E3DECE; --ink:#15160E; --ink70:#4C4B3D; --ink45:#7C7A68; --pop:#FF5D2E; --line:rgba(21,22,14,.14); }
+  *{box-sizing:border-box} a{color:inherit; text-decoration:none}
+  html,body{margin:0; height:100%; background:var(--bone); color:var(--ink); font-family:"Hanken Grotesk",system-ui,sans-serif; overflow:hidden}
+  #stage{position:fixed; inset:0; overflow:hidden}
+  #cont{position:absolute; inset:0; z-index:0; display:block}
+
+  /* core: dark portal + screen-blended video */
+  .core{position:absolute; left:50%; top:53%; transform:translate(-50%,-50%); z-index:1; width:min(740px,92vw); height:min(600px,66vh); display:grid; place-items:center; pointer-events:none}
+  .core .portal{position:absolute; inset:-8%; border-radius:50%; background:radial-gradient(circle, rgba(7,9,5,.95) 0%, rgba(7,9,5,.78) 32%, rgba(7,9,5,.28) 55%, rgba(233,229,215,0) 70%)}
+  .core video{position:relative; width:100%; height:100%; object-fit:contain; mix-blend-mode:screen; filter:saturate(1.12) contrast(1.08) brightness(1.05);
+    -webkit-mask-image:radial-gradient(circle at 50% 50%, #000 28%, rgba(0,0,0,.5) 48%, transparent 63%);
+    mask-image:radial-gradient(circle at 50% 50%, #000 28%, rgba(0,0,0,.5) 48%, transparent 63%)}
+
+  /* top bar */
+  .bar{position:absolute; top:0; left:0; right:0; z-index:10; display:flex; align-items:center; justify-content:space-between; padding:22px clamp(20px,4vw,48px)}
+  .pill{font-family:"Spline Sans Mono",monospace; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600; padding:12px 18px; border-radius:999px; background:var(--pop); color:#fff; display:inline-flex; gap:8px; align-items:center}
+  .omark{width:34px; height:34px; border:1.6px solid var(--ink); border-radius:9px; display:grid; place-items:center; font-family:"Bricolage Grotesque",sans-serif; font-weight:700; color:var(--ink)}
+  .omark span{color:var(--pop)}
+  .menu{width:46px; height:46px; border:1.4px solid var(--line); border-radius:11px; display:grid; place-items:center; gap:5px; background:rgba(21,22,14,.03)}
+  .menu i{display:block; width:18px; height:1.6px; background:var(--ink)}
+
+  /* wordmark */
+  .mark{position:absolute; z-index:4; top:clamp(80px,12vh,120px); left:50%; transform:translateX(-50%); text-align:center; width:100%}
+  .mark h1{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(3.4rem,13vw,9.5rem); line-height:.82; letter-spacing:-.05em; margin:0; color:var(--ink)}
+  .mark h1 span{color:transparent; -webkit-text-stroke:1.4px rgba(21,22,14,.5); text-stroke:1.4px rgba(21,22,14,.5)}
+  .mark .sub{margin-top:14px; font-family:"Spline Sans Mono",monospace; font-size:clamp(.6rem,1.3vw,.76rem); letter-spacing:.28em; text-transform:uppercase; color:var(--ink70)}
+
+  /* NEXT CUT ticket */
+  .ticket{position:absolute; z-index:6; left:clamp(18px,4vw,48px); bottom:clamp(24px,6vh,56px); width:min(290px,74vw); background:#14160D; color:var(--bone); border-radius:15px; overflow:hidden; box-shadow:0 30px 60px -34px rgba(0,0,0,.6)}
+  .ticket__hd{display:flex; justify-content:space-between; align-items:center; padding:13px 16px; border-bottom:1px dashed rgba(233,229,215,.18)}
+  .ticket__hd .t{font-family:"Spline Sans Mono",monospace; font-size:.62rem; letter-spacing:.18em; text-transform:uppercase; color:rgba(233,229,215,.6)}
+  .ticket__hd .live{font-family:"Spline Sans Mono",monospace; font-size:.6rem; color:var(--pop); display:flex; align-items:center; gap:6px}
+  .ticket__hd .live::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--pop); box-shadow:0 0 8px var(--pop); animation:bk 1.5s infinite}
+  @keyframes bk{0%,100%{opacity:1}50%{opacity:.3}}
+  .ticket__b{padding:15px 16px 4px}
+  .ticket__mk{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:1.5rem; letter-spacing:-.02em}
+  .ticket__eff{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:2.7rem; line-height:1; color:var(--pop); margin-top:2px; letter-spacing:-.03em}
+  .ticket__rows{margin-top:12px; display:grid; gap:8px; padding-bottom:12px}
+  .ticket__rows .r{display:flex; justify-content:space-between; font-size:.8rem; padding-bottom:8px; border-bottom:1px dotted rgba(233,229,215,.16)}
+  .ticket__rows .r:last-child{border-bottom:0; padding-bottom:0}
+  .ticket__rows .k{font-family:"Spline Sans Mono",monospace; font-size:.58rem; letter-spacing:.1em; text-transform:uppercase; color:rgba(233,229,215,.55)}
+  .ticket__rows .v{color:var(--bone)} .ticket__rows .v.p{color:var(--pop)}
+  .ticket__perf{height:13px; background:radial-gradient(circle at 6.5px 0, transparent 0 6px, #14160D 6px) repeat-x; background-size:13px 13px}
+
+  /* bottom-right cta */
+  .brc{position:absolute; z-index:6; right:clamp(18px,4vw,48px); bottom:clamp(30px,6vh,60px); text-align:right; font-family:"Spline Sans Mono",monospace}
+  .brc .l{font-size:.6rem; letter-spacing:.16em; text-transform:uppercase; color:var(--ink45)}
+  .brc a{display:inline-block; margin-top:8px; font-size:.74rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink); border-bottom:1px solid var(--pop); padding-bottom:3px}
+</style>
+
+<div id="stage">
+  <canvas id="cont" aria-hidden="true"></canvas>
+
+  <div class="core">
+    <div class="portal" aria-hidden="true"></div>
+    <video autoplay muted loop playsinline preload="auto">
+      <source src="videos/make_the_AI_rotate_blink_and.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <header class="bar">
+    <a class="pill" href="#">Book a demo</a>
+    <a class="omark" href="#" aria-label="Optimazi">O<span>.</span></a>
+    <button class="menu" aria-label="Menu"><i></i><i></i></button>
+  </header>
+
+  <div class="mark">
+    <h1>OPTIM<span>AZI</span></h1>
+    <div class="sub">Gelian (Pvt) Ltd · AI fabric-cost optimizer</div>
+  </div>
+
+  <aside class="ticket">
+    <div class="ticket__hd"><span class="t">Next cut</span><span class="live">Ultranest live</span></div>
+    <div class="ticket__b">
+      <div class="ticket__mk">Marker 04</div>
+      <div class="ticket__eff tnum" id="eff">88.4%</div>
+      <div class="ticket__rows">
+        <div class="r"><span class="k">Fabric</span><span class="v mono">Cotton twill · 150 cm</span></div>
+        <div class="r"><span class="k">Consumption</span><span class="v mono tnum">1.42 m / gmt</span></div>
+        <div class="r"><span class="k">Saved vs 78%</span><span class="v p mono">+13.4%</span></div>
+      </div>
+    </div>
+    <div class="ticket__perf" aria-hidden="true"></div>
+  </aside>
+
+  <div class="brc">
+    <div class="l">Marker to cut plan · minutes</div>
+    <a href="#">See how it works →</a>
+  </div>
+</div>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var cv=document.getElementById("cont"), ctx=cv.getContext("2d"), W,H,DPR,mx=0.5,my=0.5;
+  function size(){ DPR=Math.min(2,window.devicePixelRatio||1); W=cv.clientWidth=innerWidth; H=cv.clientHeight=innerHeight; cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0); }
+  addEventListener("resize", size); size();
+  addEventListener("mousemove", function(e){ mx=e.clientX/W; my=e.clientY/H; }, {passive:true});
+
+  var LEVELS=[-2.7,-1.8,-0.9,0,0.9,1.8,2.7];
+  var MS={1:[3,2],2:[2,1],3:[3,1],4:[0,1],5:[0,3,2,1],6:[0,2],7:[0,3],8:[0,3],9:[0,2],10:[0,1,2,3],11:[0,1],12:[3,1],13:[1,2],14:[3,2]};
+  function fld(x,y,T){ return Math.sin(x*0.006+T*1.5)+Math.sin(y*0.0082-T*1.2)+Math.sin((x+y)*0.005+T)+0.6*Math.sin((x-y)*0.0091-T*0.8); }
+  function EP(e,pt,pr,pb,pl){ return e===0?pt:e===1?pr:e===2?pb:pl; }
+  function draw(ts){
+    ctx.clearRect(0,0,W,H);
+    var T=(ts||0)*0.00033, ox=(mx-0.5)*30, oy=(my-0.5)*22;
+    var CELL=Math.max(40,Math.min(60,Math.round(W/32))), gc=Math.ceil(W/CELL)+3, gr=Math.ceil(H/CELL)+3, g=new Float32Array(gc*gr),i,j,x,y;
+    for(j=0;j<gr;j++){ for(i=0;i<gc;i++){ g[j*gc+i]=fld(i*CELL-ox, j*CELL-oy, T); } }
+    for(var li=0;li<LEVELS.length;li++){ var L=LEVELS[li];
+      ctx.strokeStyle=(li===3)?"rgba(255,93,46,0.16)":"rgba(21,22,14,0.10)"; ctx.lineWidth=1.1; ctx.beginPath();
+      for(y=0;y<gr-1;y++){ for(x=0;x<gc-1;x++){ var tl=g[y*gc+x],tr=g[y*gc+x+1],br=g[(y+1)*gc+x+1],bl=g[(y+1)*gc+x];
+        var ci=(tl>L?8:0)|(tr>L?4:0)|(br>L?2:0)|(bl>L?1:0); if(ci===0||ci===15) continue;
+        var X=x*CELL,Y=y*CELL, pt=[X+CELL*(L-tl)/(tr-tl),Y],pr=[X+CELL,Y+CELL*(L-tr)/(br-tr)],pb=[X+CELL*(L-bl)/(br-bl),Y+CELL],pl=[X,Y+CELL*(L-tl)/(bl-tl)];
+        var seg=MS[ci]; for(var s=0;s<seg.length;s+=2){ var a=EP(seg[s],pt,pr,pb,pl),z=EP(seg[s+1],pt,pr,pb,pl); ctx.moveTo(a[0],a[1]); ctx.lineTo(z[0],z[1]); } } }
+      ctx.stroke();
+    }
+  }
+  if(reduce){ draw(0); } else { var run=true; var loop=function(ts){ if(run){ draw(ts); requestAnimationFrame(loop); } }; requestAnimationFrame(loop);
+    document.addEventListener("visibilitychange", function(){ run=!document.hidden; if(run) requestAnimationFrame(loop); }); }
+
+  var eff=document.getElementById("eff"), ev=88.4;
+  if(!reduce){ setInterval(function(){ ev=Math.max(87.4,Math.min(89.2,ev+(Math.random()-.5)*.6)); if(eff) eff.textContent=ev.toFixed(1)+"%"; },900); }
+})();
+</script>
