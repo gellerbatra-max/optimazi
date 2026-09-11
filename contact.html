@@ -14,7 +14,8 @@
     --line:rgba(40,44,32,.16); --line-2:rgba(40,44,32,.08); --ice:#3A7CA5;
     --cont-ink:rgba(40,44,32,.06); --cont-pop:rgba(255,93,46,.10);
   }
-  .bar.scrolled{background:rgba(244,244,237,.82);border-bottom:1px solid var(--line)}
+  /* header floats transparent like the home page — no solid bar on scroll */
+  .bar.scrolled{background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;border-bottom:0}
   .menu{background:rgba(40,44,32,.03)}
 </style>
 
