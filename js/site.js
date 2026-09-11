@@ -45,7 +45,7 @@
   document.addEventListener("keydown", function(e){ if(e.key==="Escape" && navmenu.classList.contains("open")) setMenu(false); });
   /* photo columns counter-slide on the Y axis with the cursor — slow, subtle ease (Lando) */
   var colA=navmenu.querySelector(".nmc--a"), colB=navmenu.querySelector(".nmc--b"), mTgtY=0, mCurY=0;
-  navmenu.addEventListener("mousemove", function(e){ mTgtY=(innerHeight/2 - e.clientY)*0.15; });
+  navmenu.addEventListener("mousemove", function(e){ mTgtY=(innerHeight/2 - e.clientY)*0.25; });
   navmenu.addEventListener("mouseleave", function(){ mTgtY=0; });
   /* mark the current page's link */
   (function(){ var f=(location.pathname.split("/").pop()||"index.html"); if(!f) f="index.html";
@@ -66,7 +66,7 @@
         var seg=mMS[ci],si; for(si=0;si<seg.length;si+=2){ var a=mEP(seg[si],pt,pr,pb,pl),z=mEP(seg[si+1],pt,pr,pb,pl); mctx.moveTo(a[0],a[1]); mctx.lineTo(z[0],z[1]); } } }
       mctx.stroke();
     }
-    if(colA){ mCurY+=(mTgtY-mCurY)*0.09; colA.style.transform="translate3d(0,"+mCurY.toFixed(2)+"px,0)"; colB.style.transform="translate3d(0,"+(-mCurY).toFixed(2)+"px,0)"; }
+    if(colA){ mCurY+=(mTgtY-mCurY)*0.16; colA.style.transform="translate3d(0,"+mCurY.toFixed(2)+"px,0)"; colB.style.transform="translate3d(0,"+(-mCurY).toFixed(2)+"px,0)"; }
     requestAnimationFrame(mDraw);
   }
 
