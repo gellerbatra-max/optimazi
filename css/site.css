@@ -25,7 +25,19 @@ main{position:relative;z-index:1}
 .navbrand{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.25rem;letter-spacing:-.02em}
 .navbrand span{color:var(--pop)}
 .menu{width:46px;height:46px;border:1.4px solid var(--line);border-radius:11px;display:grid;place-items:center;gap:5px;background:rgba(233,242,250,.03);cursor:pointer}
-.menu i{display:block;width:18px;height:1.6px;background:var(--fg)}
+.menu i{display:block;width:18px;height:1.6px;background:var(--fg);transition:transform .3s}
+.menu.open i:first-child{transform:translateY(3.3px) rotate(45deg)}
+.menu.open i:last-child{transform:translateY(-3.3px) rotate(-45deg)}
+body.menu-open{overflow:hidden}
+.navmenu{position:fixed;inset:0;z-index:30;background:#0B0F16;color:#F4F4ED;display:flex;flex-direction:column;justify-content:center;padding:clamp(96px,14vh,160px) clamp(22px,6vw,90px) clamp(40px,6vh,80px);opacity:0;visibility:hidden;transition:opacity .45s ease,visibility .45s;overflow:auto}
+.navmenu.open{opacity:1;visibility:visible}
+.navmenu__links{display:flex;flex-direction:column;gap:clamp(2px,1vh,12px)}
+.navmenu__links a{display:flex;align-items:baseline;gap:clamp(14px,2vw,28px);font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:clamp(2.1rem,7.5vw,5rem);line-height:1.05;letter-spacing:-.03em;color:#F4F4ED;text-transform:uppercase;transition:color .2s,transform .3s;width:fit-content}
+.navmenu__links a .n{font-family:"Spline Sans Mono",monospace;font-size:clamp(.66rem,1.1vw,.86rem);font-weight:500;color:var(--pop);letter-spacing:.12em}
+.navmenu__links a:hover{color:var(--pop);transform:translateX(12px)}
+.navmenu__foot{margin-top:clamp(30px,5vh,60px);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;border-top:1px solid rgba(244,244,237,.14);padding-top:clamp(20px,3vh,34px);font-family:"Spline Sans Mono",monospace;font-size:.78rem;letter-spacing:.04em;color:#8FA3B8}
+.navmenu__cta{background:var(--pop);color:#F4F4ED;padding:13px 24px;border-radius:999px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;font-size:.74rem}
+.navmenu__cta:hover{background:var(--pop-deep)}
 .pill{font-family:"Spline Sans Mono",monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600;padding:12px 18px;border-radius:999px;background:var(--pop);color:#fff;white-space:nowrap;transition:background .25s,transform .25s}
 .pill:hover{background:var(--pop-deep);transform:translateY(-1px)}
 

@@ -15,6 +15,26 @@
     + '<a class="pill" href="contact.html">Book a demo</a>';
   document.body.insertBefore(nav, cv.nextSibling);
 
+  /* full-screen menu */
+  var navmenu = document.createElement("div");
+  navmenu.className = "navmenu"; navmenu.id = "navmenu"; navmenu.setAttribute("aria-hidden","true");
+  navmenu.innerHTML =
+      '<nav class="navmenu__links" aria-label="Pages">'
+    +   '<a href="index.html"><span class="n">01</span>Home</a>'
+    +   '<a href="products.html"><span class="n">02</span>Products</a>'
+    +   '<a href="our-story.html"><span class="n">03</span>Our Story</a>'
+    +   '<a href="invest.html"><span class="n">04</span>Invest</a>'
+    +   '<a href="contact.html"><span class="n">05</span>Contact</a>'
+    + '</nav>'
+    + '<div class="navmenu__foot"><a class="navmenu__cta" href="contact.html">Book a demo</a>'
+    +   '<span>+94 77 177 6347 &middot; info@gelianfashion.com</span></div>';
+  document.body.appendChild(navmenu);
+  var menuBtn = nav.querySelector(".menu");
+  function setMenu(open){ navmenu.classList.toggle("open",open); menuBtn.classList.toggle("open",open); document.body.classList.toggle("menu-open",open); menuBtn.setAttribute("aria-expanded",open?"true":"false"); navmenu.setAttribute("aria-hidden",open?"false":"true"); }
+  menuBtn.addEventListener("click", function(){ setMenu(!navmenu.classList.contains("open")); });
+  navmenu.querySelectorAll("a").forEach(function(a){ a.addEventListener("click", function(){ setMenu(false); }); });
+  document.addEventListener("keydown", function(e){ if(e.key==="Escape" && navmenu.classList.contains("open")) setMenu(false); });
+
   /* mega footer */
   var foot = document.createElement("footer");
   foot.className = "megafoot";

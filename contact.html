@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Contact — Optimazi</title>
-<meta name="description" content="Book a demo of Optimazi or get in touch with Gelian (Pvt) Ltd — we'll run it on your own markers and show you the fabric you're leaving on the table.">
+<meta name="description" content="Tell us about your marker-making and nesting setup and we'll show you where Optimazi fits. Book a demo with Gelian (Pvt) Ltd.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -10,14 +10,27 @@
 <main>
   <section class="phero"><div class="wrap">
     <div class="eyebrow rl"><span class="n">·</span><span class="l">Contact</span></div>
-    <h1 class="rl">Let's run it on <em>your styles.</em></h1>
-    <p class="lead rl">Book a demo and we'll nest your own markers with Optimazi — and show you, in real numbers, the fabric you're leaving on the table.</p>
+    <h1 class="rl">Talk to <em>us.</em></h1>
+    <p class="lead rl">Tell us about your current setup and we'll show you where Optimazi brings edge — and, on your own markers, the fabric you're leaving on the table.</p>
   </div></section>
 
   <section class="sec"><div class="wrap">
     <div class="grid2">
-      <div class="rl">
-        <div class="eyebrow"><span class="n">01</span><span class="l">Get in touch</span></div>
+      <form class="card rl" onsubmit="event.preventDefault(); this.querySelector('.done').hidden=false; this.querySelector('button').textContent='Sent';">
+        <div class="field"><label for="n">Name</label><input id="n" name="name" placeholder="Your name" required></div>
+        <div class="field"><label for="co">Company</label><input id="co" name="company" placeholder="Your company"></div>
+        <div class="field"><label for="e">Work email</label><input id="e" name="email" type="email" placeholder="you@company.com" required></div>
+        <div class="grid2" style="gap:16px;margin-top:0">
+          <div class="field"><label for="ph">Phone</label><input id="ph" name="phone" type="tel" placeholder="+1 234 567 8900"></div>
+          <div class="field"><label for="cy">Country</label><input id="cy" name="country" placeholder="Your country"></div>
+        </div>
+        <div class="field"><label for="m">What are you looking to solve?</label><textarea id="m" name="message" rows="4" placeholder="e.g. marker efficiency, fabric waste, nesting turnaround, lead time…"></textarea></div>
+        <button class="btn" style="margin-top:6px" type="submit">Book a demo</button>
+        <p class="done" hidden style="margin-top:14px;color:var(--ice);font-size:.9rem">Thanks — we typically reply within one business day. (This form is front-end only for now; wire it to email/CRM before launch.)</p>
+      </form>
+
+      <div class="rl" style="--i:1">
+        <div class="eyebrow"><span class="n">·</span><span class="l">Get in touch</span></div>
         <h2 class="h2">Gelian (Pvt) Ltd.</h2>
         <ul class="flist">
           <li><b>Address</b> — No. 37, Sri Sumangala Road, Rathmalana, Sri Lanka</li>
@@ -25,15 +38,8 @@
           <li><b>Email</b> — <a class="ghost" style="border:0;padding:0" href="mailto:info@gelianfashion.com">info@gelianfashion.com</a></li>
           <li><b>Investors</b> — <a class="ghost" style="border:0;padding:0" href="mailto:info@gelianfashion.com?subject=Optimazi%20investor%20deck">request the deck</a></li>
         </ul>
+        <p class="lead" style="margin-top:26px">See Optimazi on <b>your</b> styles — book a demo and we'll nest your own markers and show you the numbers in real terms.</p>
       </div>
-      <form class="card rl" style="--i:1" onsubmit="event.preventDefault(); this.querySelector('.done').hidden=false; this.querySelector('button').textContent='Sent';">
-        <div class="field"><label for="n">Name</label><input id="n" name="name" required></div>
-        <div class="field"><label for="co">Company</label><input id="co" name="company"></div>
-        <div class="field"><label for="e">Work email</label><input id="e" name="email" type="email" required></div>
-        <div class="field"><label for="m">What would you like to see?</label><textarea id="m" name="message" rows="4"></textarea></div>
-        <button class="btn" style="margin-top:6px" type="submit">Request a demo</button>
-        <p class="done" hidden style="margin-top:14px;color:var(--ice);font-size:.9rem">Thanks — we'll be in touch. (Demo form is front-end only for now; wire it to email/CRM before launch.)</p>
-      </form>
     </div>
   </div></section>
 </main>
