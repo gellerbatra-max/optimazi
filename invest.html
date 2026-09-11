@@ -6,6 +6,18 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/site.css">
+<style>
+  /* Light "bone" theme — the original site's hero white (#F4F4ED) */
+  :root{
+    --bg:#F4F4ED; --ink-2:#FFFFFF; --ink-3:#ECECE1; --sunk:#EAEADE;
+    --fg:#282C20; --dim:#585D4F; --faint:#8A8F7F;
+    --line:rgba(40,44,32,.16); --line-2:rgba(40,44,32,.08); --ice:#3A7CA5;
+    --cont-ink:rgba(40,44,32,.06); --cont-pop:rgba(255,93,46,.10);
+  }
+  /* header floats transparent like the home page — no solid bar on scroll */
+  .bar.scrolled{background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;border-bottom:0}
+  .menu{background:rgba(40,44,32,.03)}
+</style>
 
 <main>
   <section class="phero"><div class="wrap">
