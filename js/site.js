@@ -78,7 +78,7 @@
   +   '<div class="megafoot__top"><div class="megafoot__word">OPTI<span>MAZI</span></div></div>'
   +   '<div class="mf-w">'
   +     '<div class="megafoot__hl">'
-  +       '<h2>Fighting to utilize every inch of <em>Fabric</em><br>Improved <em>Profitability</em></h2></div>'
+  +       '<h2>Fighting to use every line of <em>Fabric</em><br>to Improve <em>Profitability</em></h2></div>'
   +     '<div class="megafoot__mid">'
   +       '<nav class="megafoot__col" aria-label="Pages"><h4>Pages</h4>'
   +         '<a href="index.html">Home</a><a href="products.html">Products</a><a href="our-story.html">Our Story</a>'
