@@ -19,21 +19,48 @@
   var navmenu = document.createElement("div");
   navmenu.className = "navmenu"; navmenu.id = "navmenu"; navmenu.setAttribute("aria-hidden","true");
   navmenu.innerHTML =
-      '<nav class="navmenu__links" aria-label="Pages">'
-    +   '<a href="index.html"><span class="n">01</span>Home</a>'
-    +   '<a href="products.html"><span class="n">02</span>Products</a>'
-    +   '<a href="our-story.html"><span class="n">03</span>Our Story</a>'
-    +   '<a href="invest.html"><span class="n">04</span>Invest</a>'
-    +   '<a href="contact.html"><span class="n">05</span>Contact</a>'
-    + '</nav>'
-    + '<div class="navmenu__foot"><a class="navmenu__cta" href="contact.html">Book a demo</a>'
-    +   '<span>+94 77 177 6347 &middot; info@gelianfashion.com</span></div>';
+      '<canvas class="navmenu__tex" aria-hidden="true"></canvas>'
+    + '<div class="navmenu__gallery" aria-hidden="true">'
+    +   '<figure class="nmg nmg--1"><img src="Gemini_Generated_Image_14g0i814g0i814g0.jpg" alt="" loading="lazy"></figure>'
+    +   '<figure class="nmg nmg--2"><img src="Gemini_Generated_Image_23btiv23btiv23bt.jpg" alt="" loading="lazy"></figure>'
+    +   '<figure class="nmg nmg--3"><img src="Gemini_Generated_Image_3f4wbx3f4wbx3f4w.jpg" alt="" loading="lazy"></figure>'
+    +   '<figure class="nmg nmg--4"><img src="Gemini_Generated_Image_6gvpdu6gvpdu6gvp.jpg" alt="" loading="lazy"></figure>'
+    + '</div>'
+    + '<nav class="navmenu__links" aria-label="Pages">'
+    +   '<a href="index.html">Home</a>'
+    +   '<a href="products.html">Products</a>'
+    +   '<a href="our-story.html">Our Story</a>'
+    +   '<a href="invest.html">Invest</a>'
+    +   '<a href="contact.html">Contact</a>'
+    + '</nav>';
   document.body.appendChild(navmenu);
   var menuBtn = nav.querySelector(".menu");
-  function setMenu(open){ navmenu.classList.toggle("open",open); menuBtn.classList.toggle("open",open); document.body.classList.toggle("menu-open",open); menuBtn.setAttribute("aria-expanded",open?"true":"false"); navmenu.setAttribute("aria-hidden",open?"false":"true"); }
+  function setMenu(open){ navmenu.classList.toggle("open",open); menuBtn.classList.toggle("open",open); document.body.classList.toggle("menu-open",open); menuBtn.setAttribute("aria-expanded",open?"true":"false"); navmenu.setAttribute("aria-hidden",open?"false":"true"); if(open){ mrun=true; requestAnimationFrame(mDraw); } else { mrun=false; } }
   menuBtn.addEventListener("click", function(){ setMenu(!navmenu.classList.contains("open")); });
   navmenu.querySelectorAll("a").forEach(function(a){ a.addEventListener("click", function(){ setMenu(false); }); });
   document.addEventListener("keydown", function(e){ if(e.key==="Escape" && navmenu.classList.contains("open")) setMenu(false); });
+  var figs=navmenu.querySelectorAll(".nmg"), pf=[20,-26,28,-18];
+  navmenu.addEventListener("mousemove", function(e){ var cx=e.clientX/innerWidth-0.5, cy=e.clientY/innerHeight-0.5;
+    figs.forEach(function(fig,i){ fig.style.transform="translate3d("+(cx*pf[i%4]).toFixed(1)+"px,"+(cy*pf[i%4]*0.7).toFixed(1)+"px,0)"; }); });
+  navmenu.addEventListener("mouseleave", function(){ figs.forEach(function(fig){ fig.style.transform=""; }); });
+  /* animated blob texture on the menu ground (runs only while open) */
+  var mtex=navmenu.querySelector(".navmenu__tex"), mctx=mtex.getContext("2d"), mrun=false;
+  var mMS={1:[3,2],2:[2,1],3:[3,1],4:[0,1],5:[0,3,2,1],6:[0,2],7:[0,3],8:[0,3],9:[0,2],10:[0,1,2,3],11:[0,1],12:[3,1],13:[1,2],14:[3,2]};
+  function mEP(e,pt,pr,pb,pl){return e===0?pt:e===1?pr:e===2?pb:pl;}
+  function mDraw(ts){ if(!mrun) return; var DPR=Math.min(2,window.devicePixelRatio||1),W=innerWidth,H=innerHeight;
+    if(mtex.width!==W*DPR||mtex.height!==H*DPR){ mtex.width=W*DPR; mtex.height=H*DPR; mtex.style.width=W+"px"; mtex.style.height=H+"px"; }
+    mctx.setTransform(DPR,0,0,DPR,0,0); mctx.clearRect(0,0,W,H);
+    var T=(ts||0)*.00012, CELL=Math.max(40,Math.min(64,Math.round(W/26))), gc=Math.ceil(W/CELL)+3, gr=Math.ceil(H/CELL)+3, g=new Float32Array(gc*gr),i,j,x,y;
+    for(j=0;j<gr;j++){ for(i=0;i<gc;i++){ x=i*CELL; y=j*CELL; g[j*gc+i]=Math.sin(x*.006+T*1.4)+Math.sin(y*.0082-T*1.1)+Math.sin((x+y)*.005+T)+.6*Math.sin((x-y)*.0091-T*.8); } }
+    var LEV=[-2.7,-1.8,-.9,0,.9,1.8,2.7],li,L;
+    for(li=0;li<LEV.length;li++){ L=LEV[li]; mctx.strokeStyle=(li===3)?"rgba(255,93,46,.08)":"rgba(221,225,210,.06)"; mctx.lineWidth=1.1; mctx.beginPath();
+      for(y=0;y<gr-1;y++){ for(x=0;x<gc-1;x++){ var tl=g[y*gc+x],tr=g[y*gc+x+1],br=g[(y+1)*gc+x+1],bl=g[(y+1)*gc+x]; var ci=(tl>L?8:0)|(tr>L?4:0)|(br>L?2:0)|(bl>L?1:0); if(ci===0||ci===15) continue;
+        var X=x*CELL,Y=y*CELL, pt=[X+CELL*(L-tl)/(tr-tl),Y], pr=[X+CELL,Y+CELL*(L-tr)/(br-tr)], pb=[X+CELL*(L-bl)/(br-bl),Y+CELL], pl=[X,Y+CELL*(L-tl)/(bl-tl)];
+        var seg=mMS[ci],si; for(si=0;si<seg.length;si+=2){ var a=mEP(seg[si],pt,pr,pb,pl),z=mEP(seg[si+1],pt,pr,pb,pl); mctx.moveTo(a[0],a[1]); mctx.lineTo(z[0],z[1]); } } }
+      mctx.stroke();
+    }
+    requestAnimationFrame(mDraw);
+  }
 
   /* mega footer */
   var foot = document.createElement("footer");
