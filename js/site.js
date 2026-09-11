@@ -197,8 +197,11 @@
     var st=document.createElement("style"); st.textContent=".rl.in{opacity:1!important;transform:none!important}"; document.head.appendChild(st);
   }
 
-  /* ambient topographic contours (dark, fixed) */
+  /* ambient topographic contours (fixed); colours are theme-driven via CSS vars */
   var ctx = cv.getContext("2d"), W, H, mx=.5, my=.5;
+  var _cs=getComputedStyle(document.documentElement);
+  var contInk=(_cs.getPropertyValue("--cont-ink").trim())||"rgba(233,242,250,.05)";
+  var contPop=(_cs.getPropertyValue("--cont-pop").trim())||"rgba(255,93,46,.09)";
   function size(){ var DPR=Math.min(2,window.devicePixelRatio||1); W=innerWidth; H=innerHeight; cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0); }
   window.addEventListener("resize", size); size();
   window.addEventListener("mousemove", function(e){ mx=e.clientX/innerWidth; my=e.clientY/innerHeight; }, {passive:true});
@@ -209,7 +212,7 @@
     var T=(ts||0)*.00028, ox=(mx-.5)*30, oy=(my-.5)*22, sy=window.pageYOffset*.12;
     var CELL=Math.max(44,Math.min(64,Math.round(W/29))), gc=Math.ceil(W/CELL)+3, gr=Math.ceil(H/CELL)+3, g=new Float32Array(gc*gr),i,j,x,y;
     for(j=0;j<gr;j++){ for(i=0;i<gc;i++){ g[j*gc+i]=fld(i*CELL-ox, j*CELL-oy+sy, T); } }
-    for(var li=0;li<LEV.length;li++){ var L=LEV[li]; ctx.strokeStyle=(li===3)?"rgba(255,93,46,.09)":"rgba(233,242,250,.05)"; ctx.lineWidth=1.1; ctx.beginPath();
+    for(var li=0;li<LEV.length;li++){ var L=LEV[li]; ctx.strokeStyle=(li===3)?contPop:contInk; ctx.lineWidth=1.1; ctx.beginPath();
       for(y=0;y<gr-1;y++){ for(x=0;x<gc-1;x++){ var tl=g[y*gc+x],tr=g[y*gc+x+1],br=g[(y+1)*gc+x+1],bl=g[(y+1)*gc+x]; var ci=(tl>L?8:0)|(tr>L?4:0)|(br>L?2:0)|(bl>L?1:0); if(ci===0||ci===15) continue;
         var X=x*CELL,Y=y*CELL, pt=[X+CELL*(L-tl)/(tr-tl),Y],pr=[X+CELL,Y+CELL*(L-tr)/(br-tr)],pb=[X+CELL*(L-bl)/(br-bl),Y+CELL],pl=[X,Y+CELL*(L-tl)/(bl-tl)];
         var seg=MS[ci]; for(var s=0;s<seg.length;s+=2){ var a=EP(seg[s],pt,pr,pb,pl),z=EP(seg[s+1],pt,pr,pb,pl); ctx.moveTo(a[0],a[1]); ctx.lineTo(z[0],z[1]); } } }

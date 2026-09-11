@@ -4,6 +4,7 @@
   --fg:#EAF2FA; --dim:#8FA3B8; --faint:#5E6C86;
   --pop:#FF5D2E; --pop-deep:#E8461C; --ice:#7FC4FF;
   --line:rgba(233,242,250,.12); --line-2:rgba(233,242,250,.06); --maxw:1200px;
+  --cont-ink:rgba(233,242,250,.05); --cont-pop:rgba(255,93,46,.09);
 }
 *{box-sizing:border-box} a{color:inherit;text-decoration:none}
 html{scroll-behavior:smooth}
