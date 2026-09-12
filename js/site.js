@@ -222,3 +222,35 @@
   if(reduce){ draw(0); } else { var run=true; var loop=function(ts){ if(run){ draw(ts); requestAnimationFrame(loop); } }; requestAnimationFrame(loop);
     document.addEventListener("visibilitychange", function(){ run=!document.hidden; if(run) requestAnimationFrame(loop); }); }
 })();
+
+/* white-space blob texture (animated, fades out toward the bottom) — as on the home page; runs only if a .blankTex canvas is present */
+(function(){
+  var cv=document.querySelector(".blankTex"); if(!cv) return;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var sec=cv.parentElement, ctx=cv.getContext("2d"), W=0, H=0;
+  var MS={1:[3,2],2:[2,1],3:[3,1],4:[0,1],5:[0,3,2,1],6:[0,2],7:[0,3],8:[0,3],9:[0,2],10:[0,1,2,3],11:[0,1],12:[3,1],13:[1,2],14:[3,2]};
+  function EP(e,pt,pr,pb,pl){return e===0?pt:e===1?pr:e===2?pb:pl;}
+  function size(){ var DPR=Math.min(2,window.devicePixelRatio||1); W=sec.clientWidth; H=sec.clientHeight; cv.width=W*DPR; cv.height=H*DPR; cv.style.width=W+"px"; cv.style.height=H+"px"; ctx.setTransform(DPR,0,0,DPR,0,0); }
+  function draw(ts){
+    if(!W||!H) return;
+    var T=(ts||0)*.00013;
+    ctx.clearRect(0,0,W,H);
+    var CELL=Math.max(34,Math.min(56,Math.round(W/28)));
+    var gc=Math.ceil(W/CELL)+3, gr=Math.ceil(H/CELL)+3, g=new Float32Array(gc*gr),i,j,x,y;
+    for(j=0;j<gr;j++){ for(i=0;i<gc;i++){ x=i*CELL; y=j*CELL; g[j*gc+i]=Math.sin(x*.006+T*1.4)+Math.sin(y*.0082-T*1.1)+Math.sin((x+y)*.005+T)+.6*Math.sin((x-y)*.0091-T*.8); } }
+    var LEV=[-2.7,-1.8,-.9,0,.9,1.8,2.7],li,L;
+    for(li=0;li<LEV.length;li++){ L=LEV[li];
+      ctx.strokeStyle="rgba(42,40,32,.15)"; ctx.lineWidth=1.15; ctx.beginPath();
+      for(y=0;y<gr-1;y++){ for(x=0;x<gc-1;x++){
+        var tl=g[y*gc+x],tr=g[y*gc+x+1],br=g[(y+1)*gc+x+1],bl=g[(y+1)*gc+x];
+        var ci=(tl>L?8:0)|(tr>L?4:0)|(br>L?2:0)|(bl>L?1:0); if(ci===0||ci===15) continue;
+        var X=x*CELL,Y=y*CELL, pt=[X+CELL*(L-tl)/(tr-tl),Y], pr=[X+CELL,Y+CELL*(L-tr)/(br-tr)], pb=[X+CELL*(L-bl)/(br-bl),Y+CELL], pl=[X,Y+CELL*(L-tl)/(bl-tl)];
+        var seg=MS[ci],si; for(si=0;si<seg.length;si+=2){ var a=EP(seg[si],pt,pr,pb,pl),z=EP(seg[si+1],pt,pr,pb,pl); ctx.moveTo(a[0],a[1]); ctx.lineTo(z[0],z[1]); } } }
+      ctx.stroke();
+    }
+  }
+  size(); if("ResizeObserver" in window){ new ResizeObserver(size).observe(sec); } addEventListener("resize", size);
+  if(reduce){ draw(0); }
+  else { var run=true; var loop=function(ts){ if(run){ draw(ts); requestAnimationFrame(loop); } }; requestAnimationFrame(loop);
+    document.addEventListener("visibilitychange", function(){ run=!document.hidden; if(run) requestAnimationFrame(loop); }); }
+})();
