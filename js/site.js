@@ -135,9 +135,11 @@
     function build(){
       var W = panel.clientWidth, H = panel.clientHeight; if(!W || !H) return;
       var rise = Math.round(W*0.026); panel.style.setProperty("--rise", rise+"px"); /* top-tab height (Lando ~2.6% of card width) */
-      var st = 2, R = Math.round(Math.min(30, Math.max(18, W*0.018))), cx = W/2, TH = H + 2*rise;
-      /* Lando footer-card proportions: narrow raised top tab (wide smooth shoulders), wide shallow bottom dip */
-      var tH = Math.round(W*0.055), sT = Math.round(W*0.066), bH = Math.round(W*0.335), sB = Math.round(W*0.033), dip = Math.round(W*0.018);
+      /* Lando footer-card proportions (measured from their desktop + mobile masks): narrow raised top tab
+         (wide smooth shoulders), wide shallow bottom dip. Corner radius + dip depth are width-adaptive so
+         narrow cards get Lando's rounder corners / deeper dip, wide cards get the desktop values. */
+      var st = 2, R = Math.round(Math.max(11, Math.min(28, W*0.0127 + 7))), cx = W/2, TH = H + 2*rise;
+      var tH = Math.round(W*0.055), sT = Math.round(W*0.066), bH = Math.round(W*0.335), sB = Math.round(W*0.033), dip = Math.round(Math.max(13, Math.min(27, W*0.011 + 10)));
       var L = st, Rt = W - st, yTop = st, yT = rise, yB = rise + H, yBot = yB + dip;
       var d = "M"+L+","+(yT+R)
         + "Q"+L+","+yT+" "+(L+R)+","+yT

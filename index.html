@@ -673,8 +673,8 @@
     function build(){
       var W=panel.clientWidth, H=panel.clientHeight; if(!W||!H) return;
       var rise=Math.round(W*0.026); panel.style.setProperty("--rise", rise+"px");
-      var st=2, R=Math.round(Math.min(30,Math.max(18,W*0.018))), cx=W/2, TH=H+2*rise;
-      var tH=Math.round(W*0.055), sT=Math.round(W*0.066), bH=Math.round(W*0.335), sB=Math.round(W*0.033), dip=Math.round(W*0.018);
+      var st=2, R=Math.round(Math.max(11,Math.min(28,W*0.0127+7))), cx=W/2, TH=H+2*rise;
+      var tH=Math.round(W*0.055), sT=Math.round(W*0.066), bH=Math.round(W*0.335), sB=Math.round(W*0.033), dip=Math.round(Math.max(13,Math.min(27,W*0.011+10)));
       var L=st, Rt=W-st, yTop=st, yT=rise, yB=rise+H, yBot=yB+dip;
       var d="M"+L+","+(yT+R)+"Q"+L+","+yT+" "+(L+R)+","+yT+"L"+(cx-tH-sT)+","+yT
         +"C"+(cx-tH-sT*0.45)+","+yT+" "+(cx-tH-sT*0.55)+","+yTop+" "+(cx-tH)+","+yTop
