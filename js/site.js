@@ -115,7 +115,7 @@
       for(j=0;j<gr;j++){ for(i=0;i<gc;i++){ x=i*CELL; y=j*CELL; g[j*gc+i]=Math.sin(x*.006)+Math.sin(y*.0082)+Math.sin((x+y)*.005)+.6*Math.sin((x-y)*.0091); } }
       var LEV=[-2.7,-1.8,-.9,0,.9,1.8,2.7],li,L;
       for(li=0;li<LEV.length;li++){ L=LEV[li];
-        ctx.strokeStyle=(li===3)?zeroCol:mainCol; ctx.lineWidth=1.6; ctx.beginPath();
+        ctx.strokeStyle=(li===3)?zeroCol:mainCol; ctx.lineWidth=2.2; ctx.beginPath();
         for(y=0;y<gr-1;y++){ for(x=0;x<gc-1;x++){
           var tl=g[y*gc+x],tr=g[y*gc+x+1],br=g[(y+1)*gc+x+1],bl=g[(y+1)*gc+x];
           var ci=(tl>L?8:0)|(tr>L?4:0)|(br>L?2:0)|(bl>L?1:0); if(ci===0||ci===15) continue;
