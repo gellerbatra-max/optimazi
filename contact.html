@@ -19,6 +19,8 @@
   .menu{background:rgba(40,44,32,.03)}
   /* fade the footer section naturally up into the bone content — top meets the page seamlessly, warm emerges toward the card */
   .megafoot{background:linear-gradient(to top,#FF5D2E 0%,#FF7A48 36%,#FFC39E 66%,#F8E4D6 84%,#F4F4ED 100%);padding-top:clamp(64px,7vw,104px)}
+  /* plain white space the footer dissolves up into (opaque bone, no blobs) */
+  .footspace{position:relative;z-index:2;min-height:clamp(220px,26vw,360px);background:#F4F4ED}
 </style>
 
 <main>
@@ -56,5 +58,8 @@
       </div>
     </div>
   </div></section>
+
+  <!-- plain white space the footer dissolves up into (no blobs) -->
+  <section class="footspace" aria-hidden="true"></section>
 </main>
 <script src="js/site.js"></script>
