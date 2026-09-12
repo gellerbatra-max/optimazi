@@ -134,24 +134,25 @@
 
     function build(){
       var W = panel.clientWidth, H = panel.clientHeight; if(!W || !H) return;
-      var rise = parseFloat(getComputedStyle(panel).getPropertyValue("--rise")) || 20;
-      var st = 2, R = 13, cx = W/2, TH = H + 2*rise;
-      var tH = Math.max(170, Math.min(440, W*0.40))/2, bH = Math.max(300, Math.min(880, W*0.72))/2, s = Math.min(30, W*0.028);
-      var L = st, Rt = W - st, yTop = st, yT = rise, yB = rise + H, yBot = TH - st;
+      var rise = Math.round(W*0.026); panel.style.setProperty("--rise", rise+"px"); /* top-tab height (Lando ~2.6% of card width) */
+      var st = 2, R = Math.round(Math.min(30, Math.max(18, W*0.018))), cx = W/2, TH = H + 2*rise;
+      /* Lando footer-card proportions: narrow raised top tab (wide smooth shoulders), wide shallow bottom dip */
+      var tH = Math.round(W*0.055), sT = Math.round(W*0.066), bH = Math.round(W*0.335), sB = Math.round(W*0.033), dip = Math.round(W*0.018);
+      var L = st, Rt = W - st, yTop = st, yT = rise, yB = rise + H, yBot = yB + dip;
       var d = "M"+L+","+(yT+R)
         + "Q"+L+","+yT+" "+(L+R)+","+yT
-        + "L"+(cx-tH-s)+","+yT
-        + "C"+(cx-tH-s*0.45)+","+yT+" "+(cx-tH-s*0.55)+","+yTop+" "+(cx-tH)+","+yTop
+        + "L"+(cx-tH-sT)+","+yT
+        + "C"+(cx-tH-sT*0.45)+","+yT+" "+(cx-tH-sT*0.55)+","+yTop+" "+(cx-tH)+","+yTop
         + "L"+(cx+tH)+","+yTop
-        + "C"+(cx+tH+s*0.55)+","+yTop+" "+(cx+tH+s*0.45)+","+yT+" "+(cx+tH+s)+","+yT
+        + "C"+(cx+tH+sT*0.55)+","+yTop+" "+(cx+tH+sT*0.45)+","+yT+" "+(cx+tH+sT)+","+yT
         + "L"+(Rt-R)+","+yT
         + "Q"+Rt+","+yT+" "+Rt+","+(yT+R)
         + "L"+Rt+","+(yB-R)
         + "Q"+Rt+","+yB+" "+(Rt-R)+","+yB
-        + "L"+(cx+bH+s)+","+yB
-        + "C"+(cx+bH+s*0.45)+","+yB+" "+(cx+bH+s*0.55)+","+yBot+" "+(cx+bH)+","+yBot
+        + "L"+(cx+bH+sB)+","+yB
+        + "C"+(cx+bH+sB*0.45)+","+yB+" "+(cx+bH+sB*0.55)+","+yBot+" "+(cx+bH)+","+yBot
         + "L"+(cx-bH)+","+yBot
-        + "C"+(cx-bH-s*0.55)+","+yBot+" "+(cx-bH-s*0.45)+","+yB+" "+(cx-bH-s)+","+yB
+        + "C"+(cx-bH-sB*0.55)+","+yBot+" "+(cx-bH-sB*0.45)+","+yB+" "+(cx-bH-sB)+","+yB
         + "L"+(L+R)+","+yB
         + "Q"+L+","+yB+" "+L+","+(yB-R)
         + "Z";
