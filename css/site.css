@@ -91,8 +91,8 @@ body.menu-open{overflow:hidden}
 .megafoot__panel{--rise:clamp(15px,1.9vw,24px);--pt:clamp(30px,3.2vw,50px);--pb:clamp(120px,10.5vw,196px);position:relative;z-index:1;color:#F4F4ED;padding:var(--pt) clamp(30px,5vw,64px) var(--pb);transform:scale(.94);transform-origin:top center}
 .megafoot__frame{position:absolute;left:0;top:calc(-1*var(--rise));width:100%;height:calc(100% + 2*var(--rise));z-index:0;overflow:visible;pointer-events:none}
 .megafoot__frame path{fill:#0E0E0D;stroke:none}
-.megafoot__tex{position:absolute;left:0;top:calc(-1*var(--rise));width:100%;height:calc(100% + 2*var(--rise));z-index:1;pointer-events:none}
-.megafoot__ftex{position:absolute;inset:0;z-index:0;pointer-events:none}
+.megafoot__tex{position:absolute;left:0;top:calc(-1*var(--rise));width:100%;height:calc(100% + 2*var(--rise));z-index:1;pointer-events:none;display:none}
+.megafoot__ftex{position:absolute;inset:0;z-index:0;pointer-events:none;display:none}
 .megafoot .mf-w{position:relative;z-index:3;max-width:1180px;margin:0 auto}
 .megafoot__top{position:absolute;top:clamp(12px,1.4vw,20px);left:clamp(14px,1.8vw,26px);z-index:5;display:flex;align-items:flex-start}
 .megafoot__word{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:clamp(1.4rem,3vw,2rem);line-height:.85;letter-spacing:-.03em;color:#F4F4ED}
