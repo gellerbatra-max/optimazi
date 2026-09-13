@@ -1,0 +1,213 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hero scroll scene — lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F4F4ED; --fg:#282C20; --dim:#585D4F; --faint:#8A8F7F;
+    --pop:#F76038; --pop-deep:#E0562E; --ink:#0B1017; --card:#0F0F0E;
+    --line:rgba(40,44,32,.16);
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html{scroll-behavior:auto}
+  body{background:var(--bg); color:var(--fg); font-family:"Hanken Grotesk",system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden}
+
+  /* ---- tiny nav so the page feels real ---- */
+  .bar{position:fixed; top:0; left:0; right:0; z-index:40; display:flex; align-items:center; justify-content:space-between; padding:18px clamp(16px,3vw,40px); mix-blend-mode:difference; color:#fff}
+  .navbrand{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; letter-spacing:-.02em; font-size:clamp(1.3rem,1.6vw,1.6rem); color:#fff; text-decoration:none}
+  .navbrand span{-webkit-text-fill-color:transparent; -webkit-text-stroke:1.1px #fff}
+
+  /* ================= SCROLL SCENE ================= */
+  .scene{position:relative; height:260vh}          /* track: 2.6x viewport = scroll distance */
+  .stage{position:sticky; top:0; height:100vh; overflow:hidden; background:var(--bg)}
+
+  /* revealed background: bone + animated topographic blobs */
+  .stage__bg{position:absolute; inset:0; background:var(--bg)}
+  .stage__bg canvas{position:absolute; inset:0; width:100%; height:100%; display:block}
+
+  /* four text panels that slide in from each edge */
+  .panel{position:absolute; z-index:2; opacity:0; will-change:transform,opacity}
+  .panel .eyebrow{font-family:"Spline Sans Mono",monospace; font-size:.72rem; letter-spacing:.18em; text-transform:uppercase; color:var(--pop); margin-bottom:10px}
+  .panel h3{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; letter-spacing:-.03em; line-height:1.02; font-size:clamp(1.5rem,2.6vw,2.35rem)}
+  .panel p{color:var(--dim); margin-top:8px; font-size:clamp(.95rem,1.2vw,1.1rem); line-height:1.45; max-width:34ch}
+  .panel h3 em{font-style:italic; color:var(--pop)}
+
+  .panel--top{top:clamp(80px,9vh,120px); left:0; right:0; text-align:center; display:flex; flex-direction:column; align-items:center}
+  .panel--bottom{bottom:clamp(40px,6vh,80px); left:0; right:0; text-align:center; display:flex; flex-direction:column; align-items:center}
+  .panel--left{left:clamp(24px,4vw,68px); top:50%; transform:translateY(-50%); text-align:left; max-width:26vw}
+  .panel--right{right:clamp(24px,4vw,68px); top:50%; text-align:right; max-width:26vw; display:flex; flex-direction:column; align-items:flex-end}
+  .panel--right p{text-align:right}
+
+  /* the hero that contracts into a centre card */
+  .herocard{position:absolute; inset:0; z-index:3; transform-origin:center center; will-change:transform,border-radius;
+    background:radial-gradient(120% 120% at 50% 30%, #16202E 0%, var(--card) 62%); overflow:hidden; box-shadow:0 40px 120px rgba(0,0,0,.28)}
+  .herocard__inner{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:18px; padding:24px}
+  .orb{width:clamp(150px,20vw,260px); aspect-ratio:1; border-radius:50%;
+    background:radial-gradient(circle at 50% 45%, #FFB48F 0%, var(--pop) 34%, var(--pop-deep) 60%, #3a1508 100%);
+    box-shadow:0 0 90px 10px rgba(247,96,56,.35), inset 0 0 60px rgba(0,0,0,.35); filter:saturate(1.05)}
+  .herocard h1{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; letter-spacing:-.035em; font-size:clamp(2.6rem,7vw,5.4rem); line-height:1; color:#F4F4ED}
+  .herocard h1 span{-webkit-text-fill-color:transparent; -webkit-text-stroke:1.6px #F4F4ED}
+  .herocard .tag{font-family:"Spline Sans Mono",monospace; font-size:.8rem; letter-spacing:.14em; text-transform:uppercase; color:#B9C6D6}
+  .herocard .tag b{color:var(--pop); font-weight:600}
+
+  .scrollcue{position:absolute; left:50%; bottom:26px; transform:translateX(-50%); z-index:4; font-family:"Spline Sans Mono",monospace; font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; color:#B9C6D6; will-change:opacity}
+  .scrollcue::after{content:""; display:block; width:1px; height:26px; margin:8px auto 0; background:linear-gradient(#B9C6D6,transparent)}
+
+  /* a normal section after the scene, so there is somewhere to land */
+  .after{min-height:100vh; padding:clamp(60px,10vw,140px) clamp(20px,6vw,90px); background:var(--bg)}
+  .after .eyebrow{font-family:"Spline Sans Mono",monospace; font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; color:var(--pop)}
+  .after h2{font-family:"Bricolage Grotesque",sans-serif; font-weight:800; letter-spacing:-.035em; font-size:clamp(2rem,5vw,3.4rem); margin-top:14px; max-width:20ch}
+
+  @media (prefers-reduced-motion: reduce){
+    .scene{height:100vh}
+    .herocard{transform:none!important; border-radius:0!important}
+    .panel{opacity:1!important; transform:none!important}
+  }
+</style>
+
+<header class="bar">
+  <a class="navbrand" href="#">OPTI<span>MAZI</span></a>
+  <span style="font-family:'Spline Sans Mono',monospace;font-size:.72rem;letter-spacing:.14em">SCROLL ↓ DEMO</span>
+</header>
+
+<div class="scene" id="scene">
+  <div class="stage">
+    <!-- revealed bone + blobs background -->
+    <div class="stage__bg"><canvas id="blob" aria-hidden="true"></canvas></div>
+
+    <!-- four text panels (EXAMPLE copy — swap for real content) -->
+    <div class="panel panel--top" data-edge="top">
+      <div class="eyebrow">· Browser-native</div>
+      <h3>Runs where you work</h3>
+      <p>No installs, no plugins — Optimazi opens in the browser your cutting room already uses.</p>
+    </div>
+
+    <div class="panel panel--left" data-edge="left">
+      <div class="eyebrow">· Marka</div>
+      <h3>Automatic <em>marker</em> making</h3>
+      <p>Markers tuned to your fabric, grain and rules — laid out in seconds.</p>
+    </div>
+
+    <div class="panel panel--right" data-edge="right">
+      <div class="eyebrow">· Ultranest</div>
+      <h3>True-shape <em>nesting</em></h3>
+      <p>Finds the last inch of usable fabric that hand-nesting leaves behind.</p>
+    </div>
+
+    <div class="panel panel--bottom" data-edge="bottom">
+      <div class="eyebrow">· Seamline</div>
+      <h3>One dataset, first pattern to final cut</h3>
+      <p>Every handoff stays in sync — no re-drawing, no format loss.</p>
+    </div>
+
+    <!-- the hero that contracts into a card -->
+    <div class="herocard" id="herocard">
+      <div class="herocard__inner">
+        <div class="orb" aria-hidden="true"></div>
+        <h1>OPTI<span>MAZI</span></h1>
+        <div class="tag">Human intuition-driven <b>·</b> AI-powered fabric cost optimizer</div>
+      </div>
+    </div>
+
+    <div class="scrollcue" id="cue">Scroll</div>
+  </div>
+</div>
+
+<section class="after">
+  <div class="eyebrow">· Next section</div>
+  <h2>The scene releases here and the page scrolls on as normal.</h2>
+</section>
+
+<script>
+(function(){
+  var reduce = matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- animated topographic blobs on the bone background ---------- */
+  var cv = document.getElementById("blob"), ctx = cv.getContext("2d");
+  var W=0, H=0, T=0, DPR=Math.min(2, window.devicePixelRatio||1);
+  function resize(){ W=cv.width=Math.floor(cv.offsetWidth*DPR); H=cv.height=Math.floor(cv.offsetHeight*DPR); }
+  function field(x,y){ return Math.sin(x*.006+T*1.4)+Math.sin(y*.0082-T*1.1)+Math.sin((x+y)*.005+T)+.6*Math.sin((x-y)*.0091-T*.8); }
+  function drawBlobs(){
+    ctx.clearRect(0,0,W,H);
+    ctx.lineWidth=1.6*DPR; ctx.strokeStyle="rgba(247,96,56,.22)";
+    var step=34*DPR, thresholds=[-1.4,-0.7,0,0.7,1.4];
+    for(var t=0;t<thresholds.length;t++){
+      var th=thresholds[t];
+      ctx.beginPath();
+      for(var y=0;y<H-step;y+=step){
+        for(var x=0;x<W-step;x+=step){
+          var a=field(x,y)-th, b=field(x+step,y)-th, c=field(x+step,y+step)-th, d=field(x,y+step)-th;
+          var idx=(a>0?8:0)|(b>0?4:0)|(c>0?2:0)|(d>0?1:0);
+          if(idx===0||idx===15) continue;
+          function ix(p,q){ return p/(p-q); }
+          var tL=x, tT=y, tR=x+step, tB=y+step;
+          var eT=[tL+step*ix(a,b), tT], eR=[tR, tT+step*ix(b,c)], eB=[tL+step*ix(d,c), tB], eL=[tL, tT+step*ix(a,d)];
+          var seg=[];
+          switch(idx){
+            case 1: case 14: seg=[eL,eB]; break;
+            case 2: case 13: seg=[eB,eR]; break;
+            case 3: case 12: seg=[eL,eR]; break;
+            case 4: case 11: seg=[eT,eR]; break;
+            case 5: seg=[eL,eT]; ctx.moveTo(eB[0],eB[1]); ctx.lineTo(eR[0],eR[1]); break;
+            case 6: case 9: seg=[eT,eB]; break;
+            case 7: case 8: seg=[eL,eT]; break;
+            case 10: seg=[eT,eR]; ctx.moveTo(eL[0],eL[1]); ctx.lineTo(eB[0],eB[1]); break;
+          }
+          if(seg.length){ ctx.moveTo(seg[0][0],seg[0][1]); ctx.lineTo(seg[1][0],seg[1][1]); }
+        }
+      }
+      ctx.stroke();
+    }
+  }
+  var blobRun=true;
+  function blobLoop(){ if(!blobRun) return; T+=0.006; drawBlobs(); requestAnimationFrame(blobLoop); }
+  addEventListener("resize", resize);
+  resize();
+  if(reduce){ drawBlobs(); } else { blobLoop(); }
+  document.addEventListener("visibilitychange", function(){ blobRun=!document.hidden; if(blobRun&&!reduce) blobLoop(); });
+
+  /* ---------- scroll-driven scene ---------- */
+  var scene=document.getElementById("scene"), card=document.getElementById("herocard"),
+      cue=document.getElementById("cue"),
+      panels=[].slice.call(document.querySelectorAll(".panel"));
+  function ease(x){ return x<.5 ? 4*x*x*x : 1-Math.pow(-2*x+2,3)/2; } /* easeInOutCubic */
+  var FINAL_SCALE=0.40;   /* how small the hero contracts to */
+  var raf=null, lastP=-1;
+
+  function apply(p){
+    var e=ease(p);
+    /* hero contracts to a centred rounded card */
+    var s=1-(1-FINAL_SCALE)*e;
+    card.style.transform="scale("+s.toFixed(4)+")";
+    card.style.borderRadius=(e*26).toFixed(1)+"px";
+    /* scroll cue fades out fast */
+    cue.style.opacity=(1-Math.min(1,p*3)).toFixed(3);
+    /* panels slide in from their edges + fade */
+    for(var i=0;i<panels.length;i++){
+      var el=panels[i], edge=el.getAttribute("data-edge");
+      var off=(1-e); /* 1 -> 0 */
+      var tx=0, ty=0, dist=42;
+      if(edge==="top") ty=-dist*off;
+      else if(edge==="bottom") ty=dist*off;
+      else if(edge==="left") tx=-dist*off;
+      else if(edge==="right") tx=dist*off;
+      var base = (edge==="left") ? " translateY(-50%)" : (edge==="right") ? " translateY(-50%)" : "";
+      el.style.transform="translate("+tx.toFixed(1)+"px,"+ty.toFixed(1)+"px)"+base;
+      el.style.opacity=Math.max(0, (e-0.15)/0.85).toFixed(3);
+    }
+  }
+  function onScroll(){
+    var top=scene.getBoundingClientRect().top;
+    var total=scene.offsetHeight - innerHeight;
+    var p=Math.min(1, Math.max(0, -top/total));
+    if(Math.abs(p-lastP)<0.001) return;
+    lastP=p; apply(p);
+  }
+  function tick(){ onScroll(); raf=null; }
+  addEventListener("scroll", function(){ if(!raf) raf=requestAnimationFrame(tick); }, {passive:true});
+  addEventListener("resize", onScroll);
+  apply(0); onScroll();
+})();
+</script>

@@ -17,6 +17,36 @@
   /* header floats transparent like the home page — no solid bar on scroll */
   .bar.scrolled{background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;border-bottom:0}
   .menu{background:rgba(40,44,32,.03)}
+  /* already on the contact page — drop the header's Contact button */
+  .bar .pill{display:none}
+  /* no divider line between the hero and the form section */
+  .sec{border-top:0}
+  /* bring the two cards up closer to the hero */
+  .phero{padding-bottom:clamp(10px,1.8vw,24px)}
+  .sec{padding-top:clamp(6px,1.2vw,18px)}
+  /* both cards exactly the same size (equal width via 1fr, equal height via stretch) */
+  .sec .grid2{align-items:stretch}
+  .sec .grid2>.card{height:100%}
+  /* opening statement styled like the hero "Talk to us." heading */
+  .card .intro{font-family:"Bricolage Grotesque","Hanken Grotesk",sans-serif;font-weight:700;font-size:clamp(1.2rem,2.15vw,1.6rem);line-height:1.1;letter-spacing:-.03em;color:var(--fg);margin:0}
+  .card .intro em{font-style:italic;color:var(--pop)}
+  /* second card: no box — text sits directly on the page background */
+  .sec .grid2>.card:nth-child(2){background:transparent;border:0;padding-left:0;padding-right:0}
+  /* let form fields shrink with the narrowed form column (prevents Phone/Country grid blowout) */
+  .field{min-width:0}
+  .field input,.field textarea{width:100%;min-width:0;box-sizing:border-box}
+  /* larger contact list */
+  .flist{gap:14px}
+  .flist li{font-size:1.12rem}
+  .flist li .ghost{font-size:.9rem}
+  /* form submit button — match the footer "Contact" button (drop native border, 1rem) */
+  form .btn{appearance:none;-webkit-appearance:none;border:0;font-size:1rem;letter-spacing:.08em;color:#F4F4ED;cursor:pointer}
+  /* desktop 2-col: give the open text a wider column + keep ~0.5in from the form */
+  @media(min-width:821px){
+    .sec>.wrap>.grid2{grid-template-columns:1fr 1.35fr}
+    .sec>.wrap>.grid2>form{min-width:0}
+    .sec .grid2>.card:nth-child(2){padding-left:clamp(48px,3.6vw,64px)}
+  }
   /* fade the footer section naturally up into the bone content — top meets the page seamlessly, warm emerges toward the card */
   .megafoot{background:linear-gradient(to top,#F76038 0%,#FF7A48 36%,#FFC39E 66%,#F8E4D6 84%,#F4F4ED 100%);padding-top:clamp(64px,7vw,104px)}
   /* plain white space the footer dissolves up into (opaque bone, no blobs) */
@@ -25,36 +55,33 @@
 
 <main>
   <section class="phero"><div class="wrap">
-    <div class="eyebrow rl"><span class="n">·</span><span class="l">Contact</span></div>
     <h1 class="rl">Talk to <em>us.</em></h1>
-    <p class="lead rl">Tell us about your current setup and we'll show you where Optimazi brings edge — and, on your own markers, the fabric you're leaving on the table.</p>
+    <p class="lead rl">See Optimazi on your styles — book a demo and we'll show you the efficiency improvements and cost saving numbers in real terms.</p>
   </div></section>
 
   <section class="sec"><div class="wrap">
     <div class="grid2">
       <form class="card rl" onsubmit="event.preventDefault(); this.querySelector('.done').hidden=false; this.querySelector('button').textContent='Sent';">
         <div class="field"><label for="n">Name</label><input id="n" name="name" placeholder="Your name" required></div>
-        <div class="field"><label for="co">Company</label><input id="co" name="company" placeholder="Your company"></div>
-        <div class="field"><label for="e">Work email</label><input id="e" name="email" type="email" placeholder="you@company.com" required></div>
+        <div class="field"><label for="co">Business</label><input id="co" name="company" placeholder="Your business"></div>
+        <div class="field"><label for="e">Email</label><input id="e" name="email" type="email" placeholder="you@company.com" required></div>
         <div class="grid2" style="gap:16px;margin-top:0">
-          <div class="field"><label for="ph">Phone</label><input id="ph" name="phone" type="tel" placeholder="+1 234 567 8900"></div>
+          <div class="field"><label for="ph">WhatsApp</label><input id="ph" name="phone" type="tel" placeholder="+1 234 567 8900"></div>
           <div class="field"><label for="cy">Country</label><input id="cy" name="country" placeholder="Your country"></div>
         </div>
         <div class="field"><label for="m">What are you looking to solve?</label><textarea id="m" name="message" rows="4" placeholder="e.g. marker efficiency, fabric waste, nesting turnaround, lead time…"></textarea></div>
-        <button class="btn" style="margin-top:6px" type="submit">Book a demo</button>
+        <button class="btn" style="margin-top:6px" type="submit">Send</button>
         <p class="done" hidden style="margin-top:14px;color:var(--ice);font-size:.9rem">Thanks — we typically reply within one business day. (This form is front-end only for now; wire it to email/CRM before launch.)</p>
       </form>
 
-      <div class="card rl" style="--i:1;display:flex;flex-direction:column;justify-content:center">
-        <div class="eyebrow"><span class="n">·</span><span class="l">Get in touch</span></div>
-        <h2 class="h2" style="font-size:clamp(1.6rem,3vw,2.3rem)">Gelian (Pvt) Ltd.</h2>
+      <div class="card rl" style="--i:1;display:flex;flex-direction:column;justify-content:flex-start">
+        <p class="intro">Optimazi is owned by <em>Gelian</em> — a tech start-up founded in Sri Lanka, with a branch expected to be established in Australia.</p>
+        <h2 class="h2" style="font-size:clamp(1.6rem,3vw,2.3rem);margin-top:26px">Gelian (Pvt) Ltd.</h2>
         <ul class="flist">
           <li><b>Address</b> — No. 37, Sri Sumangala Road, Rathmalana, Sri Lanka</li>
           <li><b>Phone</b> — <a class="ghost" style="border:0;padding:0" href="tel:+94771776347">+94 77 177 6347</a></li>
           <li><b>Email</b> — <a class="ghost" style="border:0;padding:0" href="mailto:info@gelianfashion.com">info@gelianfashion.com</a></li>
-          <li><b>Investors</b> — <a class="ghost" style="border:0;padding:0" href="mailto:info@gelianfashion.com?subject=Optimazi%20investor%20deck">request the deck</a></li>
         </ul>
-        <p class="lead" style="margin-top:26px">See Optimazi on <b>your</b> styles — book a demo and we'll nest your own markers and show you the numbers in real terms.</p>
       </div>
     </div>
   </div></section>

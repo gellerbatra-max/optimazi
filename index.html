@@ -24,7 +24,7 @@
   .wrap{max-width:var(--maxw); margin:0 auto; padding:0 clamp(22px,5vw,56px)}
 
   /* fixed ambient contour background (behind hero) */
-  #cont{position:fixed; inset:0; z-index:0; display:block; pointer-events:none}
+  #cont{position:absolute; inset:0; z-index:0; display:block; pointer-events:none}
 
   /* nav */
   .bar{position:fixed; top:0; left:0; right:0; z-index:40; display:flex; align-items:center; justify-content:space-between; padding:20px clamp(14px,2.6vw,32px); transition:background .3s, backdrop-filter .3s, padding .3s, transform .45s cubic-bezier(.4,0,.2,1), opacity .4s ease}
@@ -32,23 +32,24 @@
   .bar.scrolled{padding-top:14px; padding-bottom:14px}
   .navbrand{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(1.45rem,1.05rem + 1.3vw,1.95rem); letter-spacing:-.02em; opacity:0; transition:opacity .3s}
   .bar.scrolled .navbrand{opacity:1; color:#191A10} .navbrand span{-webkit-text-fill-color:transparent; -webkit-text-stroke:1.2px currentColor}
-  .bar.scrolled .menu{border-color:rgba(25,26,16,.22); background:rgba(25,26,16,.03)}
+  .bar.scrolled .menu{border-color:rgba(25,26,16,.42); background:rgba(25,26,16,.03)}
   .bar.scrolled .menu i{background:#191A10}
   .bar.overdark .navbrand{opacity:0}
-  .bar.overdark .menu{border-color:var(--line); background:rgba(233,242,250,.03)}
+  .bar.overdark .menu{border-color:rgba(233,242,250,.42); background:rgba(233,242,250,.03)}
   .bar.overdark .menu i{background:var(--fg)}
-  .pill{font-family:"Spline Sans Mono",monospace; font-size:1rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600; padding:13px 22px; border-radius:6px; background:var(--pop); color:#fff; white-space:nowrap; transition:background .25s, transform .25s}
+  .pill{font-family:"Spline Sans Mono",monospace; font-size:1rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600; padding:9px 18px; border-radius:6px; background:var(--pop); color:#fff; white-space:nowrap; transition:background .25s, transform .25s}
   .pill:hover{background:var(--pop-deep); transform:translateY(-1px)}
   .bar__r{display:flex; align-items:center; gap:12px}
   .bar__l{display:flex; align-items:center; gap:14px}
-  .menu{width:46px; height:46px; border:1.4px solid var(--line); border-radius:11px; display:grid; place-items:center; gap:5px; background:rgba(233,242,250,.03); cursor:pointer}
-  .menu i{display:block; width:18px; height:1.6px; background:var(--fg); transition:transform .3s}
+  .menu{width:46px; height:46px; border:2px solid rgba(233,242,250,.42); border-radius:11px; display:grid; place-items:center; align-content:center; gap:5px; background:rgba(233,242,250,.03); cursor:pointer; transition:background .25s, border-color .25s}
+  .menu i{display:block; width:18px; height:1.6px; background:var(--fg); transition:transform .3s, background .25s}
   .menu.open i:first-child{transform:translateY(3.3px) rotate(45deg)}
   .menu.open i:last-child{transform:translateY(-3.3px) rotate(-45deg)}
   body.menu-open{overflow:hidden}
   body.menu-open .navbrand{opacity:1; color:#F4F4ED}
-  body.menu-open .menu i{background:#F4F4ED}
-  body.menu-open .menu{border-color:rgba(244,244,237,.3); background:transparent}
+  /* menu button — Lando behavior: fills with the accent on hover and while open, hamburger morphs to a × */
+  .bar .menu:hover, .bar .menu.open{background:var(--pop); border-color:var(--pop)}
+  .bar .menu:hover i, .bar .menu.open i{background:#fff}
   .navmenu{position:fixed; inset:0; z-index:30; background:#141414; color:#dde1d2; display:flex; align-items:center; gap:clamp(20px,4vw,70px); padding:clamp(90px,12vh,140px) clamp(22px,5vw,80px) clamp(40px,6vh,70px); opacity:0; visibility:hidden; transition:opacity .5s ease, visibility .5s; overflow:hidden}
   .navmenu.open{opacity:1; visibility:visible}
   .navmenu__tex{position:absolute; inset:0; width:100%; height:100%; z-index:0; pointer-events:none}
@@ -70,7 +71,20 @@
   @media(max-width:820px){ .navmenu{flex-direction:column; justify-content:center; overflow:auto} .navmenu__gallery{display:none} }
 
   /* ---------------- HERO ---------------- */
-  .hero{position:fixed; inset:0; z-index:1; height:100svh; min-height:640px; overflow:hidden}
+  .hero{position:fixed; inset:0; z-index:1; height:100svh; min-height:640px; overflow:hidden; background:#09121E; transform-origin:center center; will-change:transform; -webkit-backface-visibility:hidden; backface-visibility:hidden}
+  /* revealed bone + blob background and edge panels behind the contracting hero */
+  .reveal{position:fixed; inset:0; z-index:0; background:#F4F4ED; pointer-events:none}
+  .reveal__blob{position:absolute; inset:0; width:100%; height:100%; display:block}
+  .rpanel{position:absolute; z-index:1; opacity:0; will-change:transform,opacity; color:#191A10}
+  .rpanel .eyebrow{font-family:"Spline Sans Mono",monospace; font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; color:var(--pop); margin-bottom:9px}
+  .rpanel h3{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; letter-spacing:-.03em; line-height:1.03; font-size:clamp(1.4rem,2.4vw,2.15rem); margin:0}
+  .rpanel h3 em{font-style:italic; color:var(--pop)}
+  .rpanel p{color:#585849; margin:8px 0 0; font-size:clamp(.92rem,1.1vw,1.05rem); line-height:1.45; max-width:32ch}
+  .rpanel--top{top:clamp(84px,9vh,120px); left:0; right:0; text-align:center; display:flex; flex-direction:column; align-items:center}
+  .rpanel--bottom{bottom:clamp(40px,6vh,80px); left:0; right:0; text-align:center; display:flex; flex-direction:column; align-items:center}
+  .rpanel--left{left:clamp(28px,4vw,70px); top:50%; max-width:24vw; text-align:left}
+  .rpanel--right{right:clamp(28px,4vw,70px); top:50%; max-width:24vw; display:flex; flex-direction:column; align-items:flex-end; text-align:right}
+  .rpanel--right p{text-align:right}
   .hero__fade{position:absolute; inset:0; z-index:7; background:var(--bg); opacity:0; pointer-events:none}
   .core{position:absolute; left:50%; top:46%; transform:translate(-50%,-50%); z-index:1; width:min(1040px,98vw); aspect-ratio:16/9; max-height:80vh; pointer-events:none}
   .core > *{position:absolute; inset:0}
@@ -86,7 +100,7 @@
   .tagline__top .sep{color:var(--pop); margin:0 .6em; font-weight:600}
   .tagline__main{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(1.7rem,3.8vw,2.8rem); color:var(--fg); letter-spacing:-.02em; line-height:1; margin-top:.4em}
 
-  .ticket{position:absolute; z-index:6; left:clamp(18px,4vw,48px); bottom:clamp(24px,6vh,56px); width:min(300px,76vw); color:var(--fg); transform:scale(.84); transform-origin:left bottom}
+  .ticket{position:absolute; z-index:6; left:clamp(18px,4vw,48px); bottom:clamp(24px,6vh,56px); width:min(300px,76vw); color:var(--fg); transform:scale(.84); transform-origin:left bottom; transition:opacity .35s}
   .ticket__shape{position:absolute; inset:0; width:100%; height:100%; z-index:0; filter:drop-shadow(0 26px 58px rgba(0,0,0,.62))}
   .ticket__hd{position:relative; z-index:1; display:flex; justify-content:space-between; align-items:center; padding:40px 18px 13px; margin:0 2px; border-bottom:1px dashed rgba(233,242,250,.14)}
   .ticket__hd .t{font-family:"Spline Sans Mono",monospace; font-size:.62rem; letter-spacing:.18em; text-transform:uppercase; color:var(--faint)}
@@ -105,14 +119,17 @@
   .brc .l{font-size:.8rem; letter-spacing:.16em; text-transform:uppercase; color:var(--faint)}
   .brc a{display:inline-block; margin-top:9px; font-size:1rem; letter-spacing:.06em; text-transform:uppercase; color:var(--fg); border-bottom:1px solid var(--pop); padding-bottom:4px}
   @media(max-width:720px){ .brc{display:none} }
-  .scrollcue{position:absolute; z-index:6; left:50%; bottom:14px; transform:translateX(-50%); font-family:"Spline Sans Mono",monospace; font-size:.6rem; letter-spacing:.2em; text-transform:uppercase; color:var(--faint)}
+  .scrollcue{position:absolute; z-index:6; left:50%; bottom:14px; transform:translateX(-50%); font-family:"Spline Sans Mono",monospace; font-size:.6rem; letter-spacing:.2em; text-transform:uppercase; color:var(--faint); transition:opacity .3s}
 
   /* content page reveals over the fixed hero, on a bone ground (dark -> light on scroll) */
-  .content{position:relative; z-index:2; margin-top:100svh; border-radius:34px 34px 0 0; box-shadow:0 -30px 80px -14px rgba(0,0,0,.6);
+  .content{position:relative; z-index:2; margin-top:200svh; border-radius:34px 34px 0 0; box-shadow:0 -30px 80px -14px rgba(0,0,0,.6);
     --bg:#F4F4ED; --ink-2:#FAFAF4; --ink-3:#EDEDE4; --sunk:#ECECE3; --fg:#191A10; --dim:#585849; --faint:#8A8A77; --line:rgba(25,26,16,.15); --line-2:rgba(25,26,16,.06);
     background:var(--bg); color:var(--fg)}
   .contlight{position:sticky; top:0; height:100vh; width:100%; z-index:0; margin-bottom:-100vh; pointer-events:none; display:block}
   .content section.blk, .content .marq{background:transparent}
+  /* hero-contract scene only on desktop, motion allowed — otherwise the original hero */
+  @media (max-width:820px){ .content{margin-top:100svh} .reveal{display:none} .hero{transform:none!important; border-radius:0!important} }
+  @media (prefers-reduced-motion: reduce){ .content{margin-top:100svh} .reveal{display:none} .hero{transform:none!important; border-radius:0!important} }
   .content .marq{position:relative; z-index:1}
   /* product "screens" + closing bands stay dark on the bone page */
   .content .nest, .content .mock, .content .track, .content .footer{
@@ -292,7 +309,7 @@
   .megafoot__vid video{width:100%; height:100%; object-fit:cover; border-radius:22px; filter:saturate(1.06);
     -webkit-mask-image:radial-gradient(ellipse 72% 72% at 50% 50%, #000 52%, transparent 70%); mask-image:radial-gradient(ellipse 72% 72% at 50% 50%, #000 52%, transparent 70%)}
   .megafoot__enq{position:absolute; left:0; right:0; bottom:calc(14px - var(--pb)); text-align:center; z-index:3}
-  .megafoot__pill{display:inline-flex; align-items:center; gap:10px; font-family:"Spline Sans Mono",monospace; font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600; padding:15px 26px; border-radius:6px; background:var(--pop); color:#F4F4ED}
+  .megafoot__pill{display:inline-flex; align-items:center; gap:10px; font-family:"Spline Sans Mono",monospace; font-size:1rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600; padding:15px 26px; border-radius:6px; background:var(--pop); color:#F4F4ED}
   .megafoot__logos{display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:clamp(20px,4vw,46px); margin-top:clamp(12px,1.6vw,22px); padding-top:clamp(10px,1.4vw,16px); border-top:1px solid rgba(244,244,237,.1)}
   .megafoot__logos span{font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:clamp(.9rem,1.6vw,1.15rem); letter-spacing:-.01em; color:rgba(244,244,237,.42)}
   .megafoot__bot{display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-top:clamp(12px,1.5vw,20px); font-family:"Spline Sans Mono",monospace; font-size:.7rem; color:#7C7E72}
@@ -315,14 +332,12 @@
   :focus-visible{outline:2px solid var(--ice); outline-offset:3px; border-radius:3px}
 </style>
 
-<canvas id="cont" aria-hidden="true"></canvas>
-
 <header class="bar" id="bar">
   <div class="bar__l">
     <button class="menu" aria-label="Menu"><i></i><i></i></button>
     <a class="navbrand" href="#top">OPTI<span>MAZI</span></a>
   </div>
-  <a class="pill" href="tel:+94771776347">Call us</a>
+  <a class="pill" href="contact.html">Contact</a>
 </header>
 
 <div class="navmenu" id="navmenu" aria-hidden="true">
@@ -347,8 +362,33 @@
 </div>
 
 <main id="top">
+  <!-- REVEAL: bone + blob background and edge panels behind the contracting hero -->
+  <div class="reveal" id="reveal" aria-hidden="true">
+    <canvas class="reveal__blob" id="revblob"></canvas>
+    <div class="rpanel rpanel--top" data-edge="top">
+      <div class="eyebrow">· Browser-native</div>
+      <h3>Runs where you work</h3>
+      <p>No installs, no plugins — Optimazi opens in the browser your cutting room already uses.</p>
+    </div>
+    <div class="rpanel rpanel--left" data-edge="left">
+      <div class="eyebrow">· Marka</div>
+      <h3>Automatic <em>marker</em> making</h3>
+      <p>Markers tuned to your fabric, grain and rules — laid out in seconds.</p>
+    </div>
+    <div class="rpanel rpanel--right" data-edge="right">
+      <div class="eyebrow">· Ultranest</div>
+      <h3>True-shape <em>nesting</em></h3>
+      <p>Finds the last inch of usable fabric that hand-nesting leaves behind.</p>
+    </div>
+    <div class="rpanel rpanel--bottom" data-edge="bottom">
+      <div class="eyebrow">· Seamline</div>
+      <h3>One dataset, first pattern to final cut</h3>
+      <p>Every handoff stays in sync — no re-drawing, no format loss.</p>
+    </div>
+  </div>
   <!-- HERO -->
   <section class="hero">
+    <canvas id="cont" aria-hidden="true"></canvas>
     <div class="core">
       <div class="aura" aria-hidden="true"></div>
       <video autoplay muted loop playsinline preload="auto"><source src="videos/make_the_AI_rotate_blink_and.mp4" type="video/mp4"></video>
@@ -371,7 +411,6 @@
         </div>
       </div>
     </aside>
-    <div class="brc"><div class="l">Marker to cut plan · minutes</div><a href="products.html">See how it works →</a></div>
     <div class="scrollcue">Scroll</div>
     <div class="hero__fade" id="heroFade" aria-hidden="true"></div>
   </section>
@@ -565,7 +604,7 @@
             <a href="#">X</a>
           </nav>
         </div>
-        <div class="megafoot__enq"><a class="megafoot__pill" href="mailto:info@gelianfashion.com">Business enquiries <span>↗</span></a></div>
+        <div class="megafoot__enq"><a class="megafoot__pill" href="contact.html">Contact</a></div>
       </div>
     </div>
     <div class="megafoot__copy">© <span id="yr">2026</span> Gelian (Pvt) Ltd<br>All rights reserved.</div>
@@ -579,7 +618,7 @@
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* nav bg on scroll + hero dim as the bone page rises over it */
-  var bar=document.getElementById("bar"), heroFade=document.getElementById("heroFade");
+  var bar=document.getElementById("bar"), heroFade=document.getElementById("heroFade"), scrollcue=document.querySelector(".scrollcue"), ticket=document.querySelector(".ticket");
   function navTheme(){
     var el=document.elementFromPoint(Math.round(innerWidth*0.5), 84), dark=false, n=0;
     while(el && n++<8){ var m=getComputedStyle(el).backgroundColor.match(/[\d.]+/g);
@@ -588,7 +627,9 @@
     bar.classList.toggle("overdark", dark);
   }
   addEventListener("scroll", function(){ bar.classList.toggle("scrolled", window.pageYOffset>60);
-    if(heroFade){ heroFade.style.opacity=(Math.min(1, window.pageYOffset/innerHeight)*0.5).toFixed(3); }
+    if(heroFade){ heroFade.style.opacity=(Math.min(1, Math.max(0,(window.pageYOffset-innerHeight)/innerHeight))*0.5).toFixed(3); }
+    if(scrollcue){ scrollcue.style.opacity=Math.max(0, 1-window.pageYOffset/100).toFixed(3); }
+    if(ticket){ ticket.style.opacity=Math.max(0, 1-window.pageYOffset/240).toFixed(3); }
     navTheme(); }, {passive:true});
   addEventListener("load", navTheme); navTheme();
 
@@ -830,5 +871,66 @@
   if(reduce){ draw(0); }
   else { var run=true; var loop=function(ts){ if(run){ draw(ts); requestAnimationFrame(loop); } }; requestAnimationFrame(loop);
     document.addEventListener("visibilitychange", function(){ run=!document.hidden; if(run) requestAnimationFrame(loop); }); }
+})();
+</script>
+
+<script>
+/* HERO CONTRACT SCENE — hero shrinks to a centre card while the bone+blob background
+   and four edge panels reveal; then the existing content slides up over it as before. */
+(function(){
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var hero=document.querySelector(".hero"),
+      reveal=document.getElementById("reveal"),
+      panels=reveal?[].slice.call(reveal.querySelectorAll(".rpanel")):[];
+
+  /* --- animated topographic blobs on the revealed bone ground (orange contours) --- */
+  var cv=document.getElementById("revblob"), ctx=cv?cv.getContext("2d"):null, W=0,H=0,DPR=Math.min(2,window.devicePixelRatio||1);
+  var MS={1:[3,2],2:[2,1],3:[3,1],4:[0,1],5:[0,3,2,1],6:[0,2],7:[0,3],8:[0,3],9:[0,2],10:[0,1,2,3],11:[0,1],12:[3,1],13:[1,2],14:[3,2]};
+  function EP(e,pt,pr,pb,pl){return e===0?pt:e===1?pr:e===2?pb:pl;}
+  function rsize(){ if(!ctx)return; DPR=Math.min(2,window.devicePixelRatio||1); W=cv.clientWidth||innerWidth; H=cv.clientHeight||innerHeight; cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0); }
+  function rdraw(ts){
+    if(!ctx||!W||!H) return;
+    var T=(ts||0)*.00013;
+    ctx.clearRect(0,0,W,H);
+    var CELL=Math.max(36,Math.min(60,Math.round(W/26)));
+    var gc=Math.ceil(W/CELL)+3, gr=Math.ceil(H/CELL)+3, g=new Float32Array(gc*gr),i,j,x,y;
+    for(j=0;j<gr;j++){ for(i=0;i<gc;i++){ x=i*CELL; y=j*CELL; g[j*gc+i]=Math.sin(x*.006+T*1.4)+Math.sin(y*.0082-T*1.1)+Math.sin((x+y)*.005+T)+.6*Math.sin((x-y)*.0091-T*.8); } }
+    var LEV=[-2.7,-1.8,-.9,0,.9,1.8,2.7],li,L;
+    for(li=0;li<LEV.length;li++){ L=LEV[li]; ctx.strokeStyle=(li===3)?"rgba(247,96,56,.30)":"rgba(247,96,56,.15)"; ctx.lineWidth=1.4; ctx.beginPath();
+      for(y=0;y<gr-1;y++){ for(x=0;x<gc-1;x++){ var tl=g[y*gc+x],tr=g[y*gc+x+1],br=g[(y+1)*gc+x+1],bl=g[(y+1)*gc+x]; var ci=(tl>L?8:0)|(tr>L?4:0)|(br>L?2:0)|(bl>L?1:0); if(ci===0||ci===15) continue;
+        var X=x*CELL,Y=y*CELL, pt=[X+CELL*(L-tl)/(tr-tl),Y], pr=[X+CELL,Y+CELL*(L-tr)/(br-tr)], pb=[X+CELL*(L-bl)/(br-bl),Y+CELL], pl=[X,Y+CELL*(L-tl)/(bl-tl)];
+        var seg=MS[ci],si; for(si=0;si<seg.length;si+=2){ var a=EP(seg[si],pt,pr,pb,pl),z=EP(seg[si+1],pt,pr,pb,pl); ctx.moveTo(a[0],a[1]); ctx.lineTo(z[0],z[1]); } } }
+      ctx.stroke();
+    }
+  }
+  addEventListener("resize", rsize); if(ctx) rsize();
+
+  /* --- scroll-driven contract (desktop, motion allowed) --- */
+  function ease(x){ return x<.5 ? 4*x*x*x : 1-Math.pow(-2*x+2,3)/2; }
+  var FINAL=0.42;
+  function apply(){
+    if(!hero) return;
+    if(reduce || innerWidth<=820){ hero.style.transform=""; hero.style.borderRadius=""; return; }
+    var vh=innerHeight, p=Math.min(1, Math.max(0, window.pageYOffset/vh)), e=ease(p);
+    hero.style.transform="scale("+(1-(1-FINAL)*e).toFixed(4)+")";
+    hero.style.borderRadius=(e*24).toFixed(1)+"px";
+    for(var i=0;i<panels.length;i++){
+      var el=panels[i], edge=el.getAttribute("data-edge"), off=(1-e), d=44, tx=0, ty=0;
+      if(edge==="top") ty=-d*off; else if(edge==="bottom") ty=d*off; else if(edge==="left") tx=-d*off; else if(edge==="right") tx=d*off;
+      var base=(edge==="left"||edge==="right")?" translateY(-50%)":"";
+      el.style.transform="translate("+tx.toFixed(1)+"px,"+ty.toFixed(1)+"px)"+base;
+      el.style.opacity=Math.max(0,(e-0.12)/0.88).toFixed(3);
+    }
+  }
+  var raf=null;
+  addEventListener("scroll", function(){ if(!raf) raf=requestAnimationFrame(function(){ apply(); raf=null; }); }, {passive:true});
+  addEventListener("resize", apply);
+  apply();
+
+  /* blob loop — only while the scene is on screen */
+  if(ctx && !reduce){ var brun=true; var loop=function(ts){ if(brun){ if(window.pageYOffset < innerHeight*2.3) rdraw(ts); requestAnimationFrame(loop); } };
+    requestAnimationFrame(loop);
+    document.addEventListener("visibilitychange", function(){ brun=!document.hidden; if(brun) requestAnimationFrame(loop); });
+  } else if(ctx){ rdraw(0); }
 })();
 </script>

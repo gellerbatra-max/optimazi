@@ -12,7 +12,7 @@
   nav.className = "bar"; nav.id = "bar";
   nav.innerHTML = '<div class="bar__l"><button class="menu" aria-label="Menu"><i></i><i></i></button>'
     + '<a class="navbrand" href="index.html">OPTI<span>MAZI</span></a></div>'
-    + '<a class="pill" href="tel:+94771776347">Call us</a>';
+    + '<a class="pill" href="contact.html">Contact</a>';
   document.body.insertBefore(nav, cv.nextSibling);
 
   /* full-screen menu */
@@ -86,7 +86,7 @@
   +       '<div class="megafoot__vid"><video autoplay muted loop playsinline preload="auto"><source src="videos/3.mp4" type="video/mp4"></video></div>'
   +       '<nav class="megafoot__col right" aria-label="Social"><h4>Follow on</h4>'
   +         '<a href="#">LinkedIn</a><a href="#">Instagram</a><a href="#">YouTube</a><a href="#">X</a></nav></div>'
-  +     '<div class="megafoot__enq"><a class="megafoot__pill" href="mailto:info@gelianfashion.com">Business enquiries <span>&#8599;</span></a></div>'
+  +     '<div class="megafoot__enq"><a class="megafoot__pill" href="contact.html">Contact</a></div>'
   +   '</div>'
   + '</div>'
   + '<div class="megafoot__copy">&copy; ' + yr + ' Gelian (Pvt) Ltd<br>All rights reserved.</div>'
