@@ -11,7 +11,7 @@
   var nav = document.createElement("header");
   nav.className = "bar"; nav.id = "bar";
   nav.innerHTML = '<div class="bar__l"><button class="menu" aria-label="Menu"><i></i><i></i></button>'
-    + '<a class="navbrand" href="index.html">Optim<span>a</span>zi</a></div>'
+    + '<a class="navbrand" href="index.html">Seam<span>line</span></a></div>'
     + '<a class="pill" href="contact.html">Book a demo</a>';
   document.body.insertBefore(nav, cv.nextSibling);
 
@@ -75,7 +75,7 @@
   foot.className = "megafoot";
   foot.innerHTML =
       '<div class="megafoot__panel">'
-  +   '<div class="megafoot__top"><div class="megafoot__word">OPTI<span>MAZI</span></div></div>'
+  +   '<div class="megafoot__top"><div class="megafoot__word">SEAM<span>LINE</span></div></div>'
   +   '<div class="mf-w">'
   +     '<div class="megafoot__hl">'
   +       '<h2>Fighting to use every line of <em>Fabric</em><br>to Improve <em>Profitability</em></h2></div>'
