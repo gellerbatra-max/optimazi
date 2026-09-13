@@ -104,15 +104,16 @@
     svg.appendChild(path); panel.insertBefore(svg, panel.firstChild);
 
     /* topographic texture — light contours over the olive card, dark contours shading the orange frame */
-    function contours(ctx, W, H, mainCol, zeroCol){
-      var DPR=Math.min(2, window.devicePixelRatio||1);
-      ctx.canvas.width=W*DPR; ctx.canvas.height=H*DPR; ctx.canvas.style.width=W+"px"; ctx.canvas.style.height=H+"px";
+    function contours(ctx, W, H, mainCol, zeroCol, T){
+      T=T||0;
+      var DPR=Math.min(2, window.devicePixelRatio||1), cw=Math.round(W*DPR), ch=Math.round(H*DPR);
+      if(ctx.canvas.width!==cw||ctx.canvas.height!==ch){ ctx.canvas.width=cw; ctx.canvas.height=ch; ctx.canvas.style.width=W+"px"; ctx.canvas.style.height=H+"px"; }
       ctx.setTransform(DPR,0,0,DPR,0,0); ctx.clearRect(0,0,W,H);
       var MS={1:[3,2],2:[2,1],3:[3,1],4:[0,1],5:[0,3,2,1],6:[0,2],7:[0,3],8:[0,3],9:[0,2],10:[0,1,2,3],11:[0,1],12:[3,1],13:[1,2],14:[3,2]};
       function EP(e,pt,pr,pb,pl){return e===0?pt:e===1?pr:e===2?pb:pl;}
       var CELL=Math.max(30,Math.min(48,Math.round(W/26)));
       var gc=Math.ceil(W/CELL)+3, gr=Math.ceil(H/CELL)+3, g=new Float32Array(gc*gr),i,j,x,y;
-      for(j=0;j<gr;j++){ for(i=0;i<gc;i++){ x=i*CELL; y=j*CELL; g[j*gc+i]=Math.sin(x*.006)+Math.sin(y*.0082)+Math.sin((x+y)*.005)+.6*Math.sin((x-y)*.0091); } }
+      for(j=0;j<gr;j++){ for(i=0;i<gc;i++){ x=i*CELL; y=j*CELL; g[j*gc+i]=Math.sin(x*.006+T*1.4)+Math.sin(y*.0082-T*1.1)+Math.sin((x+y)*.005+T)+.6*Math.sin((x-y)*.0091-T*.8); } }
       var LEV=[-2.7,-1.8,-.9,0,.9,1.8,2.7],li,L;
       for(li=0;li<LEV.length;li++){ L=LEV[li];
         ctx.strokeStyle=(li===3)?zeroCol:mainCol; ctx.lineWidth=2.2; ctx.beginPath();
@@ -131,6 +132,7 @@
     panel.insertBefore(ctex, svg.nextSibling); var cctx=ctex.getContext("2d");
     var ftex=document.createElement("canvas"); ftex.className="megafoot__ftex"; ftex.setAttribute("aria-hidden","true");
     foot.insertBefore(ftex, foot.firstChild); var fctx=ftex.getContext("2d");
+    var cW=0, cTH=0; /* card texture dims, kept in sync for the animation loop */
 
     function build(){
       var W = panel.clientWidth, H = panel.clientHeight; if(!W || !H) return;
@@ -163,7 +165,7 @@
       path.setAttribute("d",d);
       var sc = parseFloat((getComputedStyle(panel).transform.match(/matrix\(\s*([-\d.]+)/)||[0,0.94])[1]) || 0.94;
       panel.style.marginBottom = Math.round(-(1-sc) * H) + "px"; /* reclaim the space the scale leaves below */
-      contours(cctx, W, TH, "rgba(244,244,237,.06)", "rgba(247,96,56,.09)");
+      cW=W; cTH=TH; contours(cctx, W, TH, "rgba(244,244,237,.06)", "rgba(247,96,56,.09)");
       ctex.style.clipPath = "path('"+d+"')"; ctex.style.webkitClipPath = "path('"+d+"')";
       var MW = foot.clientWidth, MH = foot.clientHeight;
       if(MW && MH) contours(fctx, MW, MH, "rgba(28,12,4,.05)", "rgba(28,12,4,.07)");
@@ -173,6 +175,13 @@
     window.addEventListener("resize", build);
     window.addEventListener("load", build);
     setTimeout(build,300); setTimeout(build,1200);
+    /* animate the card's blob texture (slow morph) — reduced-motion + visibility guarded */
+    if(!reduce){
+      var crun=true;
+      var cLoop=function(ts){ if(!crun) return; if(cW&&cTH) contours(cctx, cW, cTH, "rgba(244,244,237,.06)", "rgba(247,96,56,.09)", (ts||0)*.00012); requestAnimationFrame(cLoop); };
+      requestAnimationFrame(cLoop);
+      document.addEventListener("visibilitychange", function(){ crun=!document.hidden; if(crun) requestAnimationFrame(cLoop); });
+    }
 
     /* hide the top nav once the footer card comes into view */
     if("IntersectionObserver" in window){
