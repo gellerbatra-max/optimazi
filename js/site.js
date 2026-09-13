@@ -11,7 +11,7 @@
   var nav = document.createElement("header");
   nav.className = "bar"; nav.id = "bar";
   nav.innerHTML = '<div class="bar__l"><button class="menu" aria-label="Menu"><i></i><i></i></button>'
-    + '<a class="navbrand" href="index.html">Optim<span>a</span>zi</a></div>'
+    + '<a class="navbrand" href="index.html">OPTI<span>MAZI</span></a></div>'
     + '<a class="pill" href="contact.html">Book a demo</a>';
   document.body.insertBefore(nav, cv.nextSibling);
 
